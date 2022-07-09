@@ -1,0 +1,7 @@
+https://en.wikipedia.org/wiki/Monte_Carlo_tree_search
+https://web.archive.org/web/20170313041719/http://aigamedev.com/open/coverage/mcts-rome-ii/
+https://sitn.hms.harvard.edu/flash/2017/ai-video-games-toward-intelligent-game/
+https://www.remi-coulom.fr/JFFoS/JFFoS.pdf
+http://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search/
+
+https://int8.io/monte-carlo-tree-search-beginners-guide/#Policy_network_training_in_Alpha_Go_and_Alpha_Zero
