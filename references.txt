@@ -8,3 +8,8 @@ https://int8.io/monte-carlo-tree-search-beginners-guide/#Policy_network_training
 
 http://homes.di.unimi.it/~cesabian/Pubblicazioni/ml-02.pdf
 https://www.lri.fr/~sebag/Examens_2008/UCT_ecml06.pdf
+
+
+Videos:
+https://www.youtube.com/watch?v=7ESK5SaP-bc
+https://www.youtube.com/watch?v=lhFXKNyA0QA
