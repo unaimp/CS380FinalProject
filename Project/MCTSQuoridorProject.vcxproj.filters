@@ -2,29 +2,29 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="GameObject">
-      <UniqueIdentifier>{47103a6b-938c-4730-a485-e724f58dfaa1}</UniqueIdentifier>
+      <UniqueIdentifier>{102a323f-6c54-45fe-bc16-22cc5a3fb774}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameObject\StateMachines">
-      <UniqueIdentifier>{5d68f2c8-3a3d-4ca1-9c3d-bf955a6e7019}</UniqueIdentifier>
+      <UniqueIdentifier>{c088786b-cacd-4afc-b270-79303f088e60}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameObject\StateMachines\UnitTests">
-      <UniqueIdentifier>{c57d286c-c695-4829-8e0f-e94773286bdd}</UniqueIdentifier>
+      <UniqueIdentifier>{db8428a1-f3c1-415c-bac6-9b8a8d3394e6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
     <Filter Include="Animation">
-      <UniqueIdentifier>{78ab5bd2-a9c2-47b0-aef5-779aebd6998b}</UniqueIdentifier>
+      <UniqueIdentifier>{dc6d0789-2995-487b-a11c-2226994651e5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Common">
-      <UniqueIdentifier>{1e97da77-3c21-47e8-9a53-28a234f899ad}</UniqueIdentifier>
+      <UniqueIdentifier>{a1a8ee3b-f919-4552-9a7a-4f6cf8eaafab}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameEngine">
-      <UniqueIdentifier>{df1e361e-8c55-4388-a98d-aebe341fd074}</UniqueIdentifier>
+      <UniqueIdentifier>{a370a6f0-c842-4304-ba02-bf2b25191efa}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameEngine\StateMachineLanguage">
-      <UniqueIdentifier>{c3919002-4d85-4c09-b22a-991bfe99b3a5}</UniqueIdentifier>
+      <UniqueIdentifier>{a18ecb75-7438-4605-9d97-0544176499f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +39,33 @@
     </ClCompile>
     <ClCompile Include="Source\agent.cpp">
       <Filter>GameObject\StateMachines</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest1.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest2a.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest2b.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest2c.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest3a.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest3b.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest4.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest5.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\unittest6.cpp">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
     </ClCompile>
     <ClCompile Include="Source\AllocHierarchy.cpp">
       <Filter>Animation</Filter>
@@ -91,6 +118,9 @@
     <ClCompile Include="Source\terrain.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
+    <ClCompile Include="Source\time.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
     <ClCompile Include="Source\world.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
@@ -111,58 +141,7 @@
     </ClCompile>
     <ClCompile Include="Source\MultiAnimation.cpp" />
     <ClCompile Include="Source\MultiAnimationLib.cpp" />
-    <ClCompile Include="Source\Stdafx.cpp" />
-    <ClCompile Include="Source\UnitTests\unittest3a.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest3b.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest4.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest5.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest6.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest1.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest2a.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest2b.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\UnitTests\unittest2c.cpp">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Clock.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\movement_student.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\terrain_student.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PathfindingTests.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Random.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Blackboard.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Enemy.cpp">
-      <Filter>GameObject\StateMachines</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Enemy_student.cpp">
-      <Filter>GameObject\StateMachines</Filter>
-    </ClCompile>
+    <ClCompile Include="Source\MonteCarlo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -176,6 +155,33 @@
     </ClInclude>
     <ClInclude Include="Source\agent.h">
       <Filter>GameObject\StateMachines</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest1.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest2a.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest2b.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest2c.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest3a.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest3b.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest4.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest5.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\unittest6.h">
+      <Filter>GameObject\StateMachines\UnitTests</Filter>
     </ClInclude>
     <ClInclude Include="Source\resource.h">
       <Filter>Resource Files</Filter>
@@ -231,6 +237,9 @@
     <ClInclude Include="Source\terrain.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Source\time.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
     <ClInclude Include="Source\world.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
@@ -253,55 +262,12 @@
       <Filter>GameEngine\StateMachineLanguage</Filter>
     </ClInclude>
     <ClInclude Include="Source\MultiAnimation.h" />
-    <ClInclude Include="Source\Stdafx.h" />
-    <ClInclude Include="Source\UnitTests\unittest2c.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest3a.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest3b.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest4.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest5.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest6.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest1.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest2a.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\UnitTests\unittest2b.h">
-      <Filter>GameObject\StateMachines\UnitTests</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Clock.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PathfindingTests.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Random.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Blackboard.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Enemy.h">
-      <Filter>GameObject\StateMachines</Filter>
-    </ClInclude>
+    <ClInclude Include="Source\MonteCarlo.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Source\DXUT\directx.ico">
+    <Image Include="Source\DXUT\directx.ico">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="MultiAnimation.fx" />
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="MultiAnimation.manifest">
@@ -312,5 +278,8 @@
     <ResourceCompile Include="MultiAnimation.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="MultiAnimation.fx" />
   </ItemGroup>
 </Project>
