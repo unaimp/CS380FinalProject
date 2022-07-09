@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MonteCarlo.cpp" />
     <ClCompile Include="Source\Blackboard.cpp" />
     <ClCompile Include="Source\body.cpp" />
     <ClCompile Include="Source\Clock.cpp" />
@@ -221,6 +222,7 @@
     <ClCompile Include="Source\MultiAnimationLib.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="Source\Blackboard.h" />
     <ClInclude Include="Source\body.h" />
     <ClInclude Include="Source\Clock.h" />
