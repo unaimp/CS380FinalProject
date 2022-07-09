@@ -15,7 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>PathfindingProject</ProjectName>
+    <ProjectName>MCTSQuoridorProject</ProjectName>
     <ProjectGuid>{AEEBC1C1-AD79-4733-AC4A-F1F6B40C4F2C}</ProjectGuid>
     <RootNamespace>StateMachineProject</RootNamespace>
   </PropertyGroup>
