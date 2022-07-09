@@ -5,6 +5,6 @@ https://www.remi-coulom.fr/JFFoS/JFFoS.pdf
 http://jeffbradberry.com/posts/2015/09/intro-to-monte-carlo-tree-search/
 
 https://int8.io/monte-carlo-tree-search-beginners-guide/#Policy_network_training_in_Alpha_Go_and_Alpha_Zero
-S
 
-test
+http://homes.di.unimi.it/~cesabian/Pubblicazioni/ml-02.pdf
+https://www.lri.fr/~sebag/Examens_2008/UCT_ecml06.pdf
