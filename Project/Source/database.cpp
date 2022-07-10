@@ -13,7 +13,7 @@
 Database::Database( void )
 : m_nextFreeID( SYSTEM_OBJECT_ID + 1 )
 {
-
+	mAILogic = new MonteCarlo::MonteCarloTree;
 }
 
 Database::~Database( void )

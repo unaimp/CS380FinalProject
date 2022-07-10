@@ -38,6 +38,10 @@
 // Animation
 #include <Tiny.h>
 
+#include <QuoridorPlayer.h>     // final project
+#include <Action.h>
+#include <MonteCarlo.h>
+
 // Game Engine
 #include <Blackboard.h>
 #include <database.h>
@@ -74,7 +78,6 @@
 #include <PathfindingTests.h>
 
 
-#include <QuoridorPlayer.h>     // final project
 
 #pragma warning(default: 4005)
 #pragma warning(default: 4995)

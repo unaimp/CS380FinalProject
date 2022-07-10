@@ -249,7 +249,7 @@ void QuoridorPlayer::Update()
 					{
 						SetTile(m_tile, false);
 						m_tile = tile_target;
-						//g_terrain.ChangeTurn();
+						g_terrain.ChangeTurn();
 					}
 				}
 			}
@@ -259,5 +259,8 @@ void QuoridorPlayer::Update()
 		case 2: // Stair
 			break;
 		}
+	}
+	else if(!m_type && !g_terrain.IsPlayerTurn()) {
+		g_database.mAILogic->Execute();
 	}
 }

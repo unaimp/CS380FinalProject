@@ -128,12 +128,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Action.cpp" />
     <ClCompile Include="Source\Blackboard.cpp" />
     <ClCompile Include="Source\body.cpp" />
     <ClCompile Include="Source\Clock.cpp" />
     <ClCompile Include="Source\Enemy.cpp" />
     <ClCompile Include="Source\Enemy_student.cpp" />
     <ClCompile Include="Source\gameobject.cpp" />
+    <ClCompile Include="Source\MonteCarlo.cpp" />
     <ClCompile Include="Source\movement.cpp" />
     <ClCompile Include="Source\agent.cpp" />
     <ClCompile Include="Source\movement_student.cpp" />
@@ -222,11 +224,13 @@
     <ClCompile Include="Source\MultiAnimationLib.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Action.h" />
     <ClInclude Include="Source\Blackboard.h" />
     <ClInclude Include="Source\body.h" />
     <ClInclude Include="Source\Clock.h" />
     <ClInclude Include="Source\Enemy.h" />
     <ClInclude Include="Source\gameobject.h" />
+    <ClInclude Include="Source\MonteCarlo.h" />
     <ClInclude Include="Source\movement.h" />
     <ClInclude Include="Source\agent.h" />
     <ClInclude Include="Source\PathfindingTests.h" />

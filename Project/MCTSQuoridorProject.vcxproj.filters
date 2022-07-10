@@ -166,6 +166,8 @@
     <ClCompile Include="Source\QuoridorPlayer.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Action.cpp" />
+    <ClCompile Include="Source\MonteCarlo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -302,6 +304,8 @@
     <ClInclude Include="Source\QuoridorPlayer.h">
       <Filter>GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Action.h" />
+    <ClInclude Include="Source\MonteCarlo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DXUT\directx.ico">

@@ -19,6 +19,10 @@ class GameObject;
 
 typedef std::vector<GameObject*> dbCompositionList;
 
+
+class MonteCarlo::MonteCarloTree;//fwd dec
+
+
 class Database
 {
 public:
@@ -47,7 +51,7 @@ public:
 	
 	void ComposeList( dbCompositionList & list, unsigned int type = 0 );
 
-
+	MonteCarlo::MonteCarloTree* mAILogic;
 private:
 
 	typedef std::list<GameObject*> dbContainer;
