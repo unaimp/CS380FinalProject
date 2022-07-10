@@ -66,40 +66,40 @@ void QuoridorPlayer::ResetTemp()
 	}
 }
 
-bool QuoridorPlayer::IsLegalMove(TileQ tile)
+bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 {
 	TileQ bottom_left_tile(tile.row * 3, tile.col * 3);
 
 	int width = g_terrain.GetWidth() / 3;
 
 	// Moving left check
-	if (m_tile.col != 0)
+	if (origin_tile.col != 0)
 	{
-		if (m_tile.row == tile.row && m_tile.col-1 == tile.col &&
+		if (origin_tile.row == tile.row && origin_tile.col-1 == tile.col &&
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col+2) &&
 			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col) )
 			return true;
 	}
 	// Moving right check
-	if (m_tile.col != width)
+	if (origin_tile.col != width)
 	{
-		if (m_tile.row == tile.row && m_tile.col+1 == tile.col &&
+		if (origin_tile.row == tile.row && origin_tile.col+1 == tile.col &&
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-1) &&
 			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
 			return true;
 	}
 	// Moving down check
-	if (m_tile.row != 0)
+	if (origin_tile.row != 0)
 	{
-		if (m_tile.row-1 == tile.row && m_tile.col == tile.col &&
+		if (origin_tile.row-1 == tile.row && origin_tile.col == tile.col &&
 			!g_terrain.IsWall(bottom_left_tile.row+2, bottom_left_tile.col) &&
 			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
 			return true;
 	}
 	// Moving up check
-	if (m_tile.row != width)
+	if (origin_tile.row != width)
 	{
-		if (m_tile.row+1 == tile.row && m_tile.col == tile.col &&
+		if (origin_tile.row+1 == tile.row && origin_tile.col == tile.col &&
 			!g_terrain.IsWall(bottom_left_tile.row-1, bottom_left_tile.col) &&
 			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
 			return true;
@@ -108,110 +108,110 @@ bool QuoridorPlayer::IsLegalMove(TileQ tile)
 
 
 	// Moving left over player without obstacle check
-	if (m_tile.col > 1)
+	if (origin_tile.col > 1)
 	{
-		if (m_tile.row == tile.row && m_tile.col-2 == tile.col &&              // Target is this case
+		if (origin_tile.row == tile.row && origin_tile.col-2 == tile.col &&    // Target is this case
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col+5) && // No first wall
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col+2) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col+3))  // There's a player to skip over
 			return true;
 	}
 	// Moving right over player without obstacle check
-	if (m_tile.col < (width-1))
+	if (origin_tile.col < (width-1))
 	{
-		if (m_tile.row == tile.row && m_tile.col+2 == tile.col &&              // Target is this case
+		if (origin_tile.row == tile.row && origin_tile.col+2 == tile.col &&    // Target is this case
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-4) && // No first wall
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-1) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col-2))  // There's a player to skip over
 			return true;
 	}
 	// Moving down over player without obstacle check
-	if (m_tile.row > 1)
+	if (origin_tile.row > 1)
 	{
-		if (m_tile.row-2 == tile.row && m_tile.col == tile.col &&              // Target is this case
+		if (origin_tile.row-2 == tile.row && origin_tile.col == tile.col &&    // Target is this case
 			!g_terrain.IsWall(bottom_left_tile.row+5, bottom_left_tile.col) && // No first wall
 			!g_terrain.IsWall(bottom_left_tile.row+2, bottom_left_tile.col) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row+3, bottom_left_tile.col))  // There's a player to skip over
 			return true;
 	}
 	// Moving up over player without obstacle check
-	if (m_tile.row < (width-1))
+	if (origin_tile.row < (width-1))
 	{
-		if (m_tile.row+2 == tile.row && m_tile.col == tile.col &&              // Target is this case
+		if (origin_tile.row+2 == tile.row && origin_tile.col == tile.col &&    // Target is this case
 			!g_terrain.IsWall(bottom_left_tile.row-4, bottom_left_tile.col) && // No first wall
 			!g_terrain.IsWall(bottom_left_tile.row-1, bottom_left_tile.col) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row-2, bottom_left_tile.col))  // There's a player to skip over
 			return true;
 	}
 
-	bottom_left_tile.row = m_tile.row * 3;
-	bottom_left_tile.col = m_tile.col * 3;
+	bottom_left_tile.row = origin_tile.row * 3;
+	bottom_left_tile.col = origin_tile.col * 3;
 
 	// Moving left over player with obstacle check
-	if (m_tile.col != 0)
+	if (origin_tile.col != 0)
 	{
-		if (abs(m_tile.row - tile.row) == 1 && m_tile.col - 1 == tile.col &&                       // Target is of this case
+		if (abs(origin_tile.row - tile.row) == 1 && origin_tile.col - 1 == tile.col &&             // Target is of this case
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col - 1) &&                   // No first wall
 			(tile.col == 0 || g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col - 4)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col - 2))                    // There's a player to skip over
 
 		{
 			// Case for rebound down
-			if (m_tile.row != 0 && m_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
+			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound up
-			if (m_tile.row != width && m_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
+			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
 				return true;
 		}
 	}
 	// Moving right over player with obstacle check
-	if (m_tile.col != width)
+	if (origin_tile.col != width)
 	{
-		if (abs(m_tile.row - tile.row) == 1 && m_tile.col + 1 == tile.col &&                           // Target is of this case
+		if (abs(origin_tile.row - tile.row) == 1 && origin_tile.col + 1 == tile.col &&                 // Target is of this case
 			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col + 2) &&                       // No first wall
 			(tile.col == width || g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col + 5)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col + 3))                        // There's a player to skip over
 
 		{
 			// Case for rebound down
-			if (m_tile.row != 0 && m_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 2))
+			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 2))
 				return true;
 			// Case for rebound up
-			if (m_tile.row != width && m_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 2))
+			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 2))
 				return true;
 		}
 	}
 	// Moving down over player with obstacle check
-	if (m_tile.row != 0)
+	if (origin_tile.row != 0)
 	{
-		if (abs(m_tile.col - tile.col) == 1 && m_tile.row - 1 == tile.row &&                       // Target is of this case
+		if (abs(origin_tile.col - tile.col) == 1 && origin_tile.row - 1 == tile.row &&             // Target is of this case
 			!g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col) &&                   // No first wall
 			(tile.row == 0 || g_terrain.IsWall(bottom_left_tile.row - 4, bottom_left_tile.col)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row - 2, bottom_left_tile.col))                    // There's a player to skip over
 
 		{
 			// Case for rebound left
-			if (m_tile.col != 0 && m_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
+			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound right
-			if (m_tile.col != width && m_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 2))
+			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 2))
 				return true;
 		}
 	}
 	// Moving up over player with obstacle check
-	if (m_tile.row != width)
+	if (origin_tile.row != width)
 	{
-		if (abs(m_tile.col - tile.col) == 1 && m_tile.row + 1 == tile.row &&                           // Target is of this case
+		if (abs(origin_tile.col - tile.col) == 1 && origin_tile.row + 1 == tile.row &&                 // Target is of this case
 			!g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col) &&                       // No first wall
 			(tile.row == width || g_terrain.IsWall(bottom_left_tile.row + 5, bottom_left_tile.col)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row + 3, bottom_left_tile.col))                        // There's a player to skip over
 
 		{
 			// Case for rebound left
-			if (m_tile.col != 0 && m_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
+			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound right
-			if (m_tile.col != width && m_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 3))
+			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 3))
 				return true;
 		}
 	}
@@ -235,14 +235,14 @@ void QuoridorPlayer::Update()
 		TileQ tile_target(target.row / 3, target.col / 3);
 
 		if (g_terrain.IsMousClick())
-			IsLegalMove(tile_target);
+			IsLegalMove(m_tile, tile_target);
 
 		switch (g_terrain.GetPlayerQuoridorMode())
 		{
 		case 0: // Move
 			if (target.row % 3 != 2 && target.col % 3 != 2)
 			{
-				if (IsLegalMove(tile_target))
+				if (IsLegalMove(m_tile, tile_target))
 				{
 					SetTileTemp(tile_target);
 					if (g_terrain.IsMousClick())
