@@ -55,7 +55,7 @@ namespace MonteCarlo {
 
 	struct Simulator {
 		double Simulate(MonteCarloTree::Node* startingPoint, QuoridorPlayer* AI, QuoridorPlayer* player);
-		State RollOut(const State currentState, QuoridorPlayer* q, bool AITurn);
+		State& RollOut(const State currentState, QuoridorPlayer* q, bool AITurn, bool fwdNOT, bool rightNOT, bool leftNOT);
 
 	private:
 		int mPlayerRow, mPlayerColumn;

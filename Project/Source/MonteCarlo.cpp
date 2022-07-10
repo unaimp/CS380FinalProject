@@ -177,7 +177,7 @@ namespace MonteCarlo {
 				AIWIN = 1.;
 				break;
 			}
-			AIState = RollOut(AIState, AI, true);
+			AIState = RollOut(AIState, AI, true, false, false, false);
 			mAIRow = AIState.mRow;		mAIColumn = AIState.mColumn;
 
 			//player simulation turn
@@ -185,7 +185,7 @@ namespace MonteCarlo {
 				AIWIN = -1.;
 				break;
 			}
-			playerState = RollOut(playerState, AI, false);
+			playerState = RollOut(playerState, AI, false, false, false, false);
 			mPlayerRow = playerState.mRow;		mPlayerColumn = playerState.mColumn;
 		}
 
@@ -194,48 +194,50 @@ namespace MonteCarlo {
 	}
 
 	//OPTIMIZATIONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN        NEEDEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
-	State Simulator::RollOut(const State currentState, QuoridorPlayer* q,  bool AITurn) {
+	State& Simulator::RollOut(const State currentState, QuoridorPlayer* q,  bool AITurn, bool fwdNOT, bool rightNOT, bool leftNOT) {
 		//biased randomizer for next move
 		int r = rand() % 10;
 
 		if (r < 6) {
-			if (AITurn) {
+			if (fwdNOT) 
+				r += 6;
+			else if (AITurn) {
 				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow - 1, currentState.mColumn)))
 					return State(Moves::M_MOVE_DOWN, currentState.mRow, currentState.mColumn, AITurn);
 				else
-					return RollOut(currentState, q, AITurn); //repeat
+					return RollOut(currentState, q, AITurn, true, rightNOT, leftNOT); //repeat
 			}
 			else { //human movement simulation
 				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow + 1, currentState.mColumn)))
 					return State(Moves::M_MOVE_UP, currentState.mRow, currentState.mColumn, AITurn);
 				else
-					return RollOut(currentState, q, AITurn); //repeat
+					return RollOut(currentState, q, AITurn, true, rightNOT, leftNOT); //repeat
 			}
 		}
 		if (r >= 6 && r < 8) {
 			if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow, currentState.mColumn + 1)))
 				return State(Moves::M_MOVE_RIGHT, currentState.mRow, currentState.mColumn, AITurn);
 			else
-				return RollOut(currentState, q, AITurn); //repeat
+				return RollOut(currentState, q, AITurn, fwdNOT, true, leftNOT); //repeat
 		}
 		if (r >= 8 && r < 10) {
 			if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow, currentState.mColumn - 1)))
 				return State(Moves::M_MOVE_LEFT, currentState.mRow, currentState.mColumn, AITurn);
 			else
-				return RollOut(currentState, q, AITurn); //repeat
+				return RollOut(currentState, q, AITurn, fwdNOT, rightNOT, true); //repeat
 		}
-		if (r == 10) {
+		if (r >= 10) {
 			if (AITurn) {
 				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow + 1, currentState.mColumn)))
 					return State(Moves::M_MOVE_UP, currentState.mRow, currentState.mColumn, AITurn);
 				else
-					return RollOut(currentState, q, AITurn); //repeat
+					return RollOut(currentState, q, AITurn, fwdNOT, rightNOT, leftNOT); //repeat
 			}
 			else {//human movement simulation
 				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow - 1, currentState.mColumn)))
 					return State(Moves::M_MOVE_DOWN, currentState.mRow, currentState.mColumn, AITurn);
 				else
-					return RollOut(currentState, q, AITurn); //repeat
+					return RollOut(currentState, q, AITurn, fwdNOT, rightNOT, leftNOT); //repeat
 			}
 
 		}
