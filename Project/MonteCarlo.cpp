@@ -79,7 +79,7 @@ namespace MonteCarlo {
 	void MonteCarloTree::BackPropagation(Node* node) {
 		if (node == nullptr)		return; //root node
 
-
+		//update values
 
 		BackPropagation(node->mParent);
 	}
