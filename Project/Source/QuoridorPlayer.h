@@ -22,7 +22,7 @@ public:
 
 	void ResetTemp();
 
-	bool IsLegalMove(TileQ tile);
+	bool IsLegalMove(TileQ origin_tile, TileQ tile);
 
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }
