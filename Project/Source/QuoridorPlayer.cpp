@@ -467,7 +467,7 @@ void QuoridorPlayer::Update()
 					{
 						SetWall(tile_target);
 						m_walls--;
-						//g_terrain.ChangeTurn();
+						g_terrain.ChangeTurn();
 					}
 				}
 			}

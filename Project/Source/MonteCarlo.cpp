@@ -78,7 +78,7 @@ namespace MonteCarlo {
 		}
 
 
-		std::cout << "AI move to:" << betterOption->mState->mRow << ", " << betterOption->mState->mColumn << std::endl;
+		//std::cout << "AI move to:" << betterOption->mState->mRow << ", " << betterOption->mState->mColumn << std::endl;
 		//actually move the AI player on the board
 		//erase color from previous one
 		mAIPlayer->SetTile(TileQ(mRoot->mState->mRow, mRoot->mState->mColumn), false);
