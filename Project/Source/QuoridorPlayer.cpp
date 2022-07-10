@@ -315,10 +315,10 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 
 		{
 			// Case for rebound down
-			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 2))
+			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 3))
 				return true;
 			// Case for rebound up
-			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 2))
+			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 3))
 				return true;
 		}
 	}
@@ -332,10 +332,10 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 
 		{
 			// Case for rebound left
-			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
+			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 2, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound right
-			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 2))
+			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 2, bottom_left_tile.col + 2))
 				return true;
 		}
 	}
@@ -349,10 +349,10 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 
 		{
 			// Case for rebound left
-			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
+			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 3, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound right
-			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 3))
+			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 3, bottom_left_tile.col + 2))
 				return true;
 		}
 	}
@@ -424,7 +424,7 @@ void QuoridorPlayer::Update()
 
 	if (m_type && g_terrain.IsPlayerTurn())
 	{
-		ResetTemp();
+		//ResetTemp();
 
 		D3DXVECTOR3 temp = g_terrain.GetMousePos();
 
