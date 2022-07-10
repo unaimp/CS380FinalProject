@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(200),
+		mMaximumIterations(1000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -22,8 +22,10 @@ namespace MonteCarlo {
 	void MonteCarloTree::Start(void) {
 		mCurrentIterations = 0;
 
-		if(!mAIPlayer)
+		if (!mAIPlayer) {
 			mAIPlayer = &g_database.Find("NPC")->GetQuoridor();
+			mHumanPlayer = &g_database.Find("Player")->GetQuoridor();
+		}
 		//create root node from AI position
 
 		mRoot = new Node();
@@ -73,8 +75,13 @@ namespace MonteCarlo {
 			}
 		}
 
+
+		std::cout << "AI move to:" << betterOption->mState->mRow << ", " << betterOption->mState->mColumn << std::endl;
 		//actually move the AI player on the board
-		mAIPlayer->SetTile(TileQ(betterOption->mState->mRow, betterOption->mState->mColumn), true);
+		//erase color from previous one
+		mAIPlayer->SetTile(TileQ(mRoot->mState->mRow, mRoot->mState->mColumn), false);
+		//set new tile position
+		mAIPlayer->m_tile = TileQ(betterOption->mState->mRow, betterOption->mState->mColumn);
 		
 		//erase the created tree
 		End();
@@ -138,7 +145,7 @@ namespace MonteCarlo {
 	/* Complete one random playout from node C
 	A playout may be as simple as choosing uniform random moves until the game is decided */
 	double MonteCarloTree::Simulation(Node* node) {
-		return mSimulator->Simulate(node, mAIPlayer);
+		return mSimulator->Simulate(node, mAIPlayer, mHumanPlayer);
 	}
 
 	/*Use the result of the playout to update information in the nodes on the path from C to R.*/
@@ -153,10 +160,10 @@ namespace MonteCarlo {
 	}
 
 
-	double Simulator::Simulate(MonteCarloTree::Node* startingPoint, QuoridorPlayer* q) {
+	double Simulator::Simulate(MonteCarloTree::Node* startingPoint, QuoridorPlayer* AI, QuoridorPlayer* player) {
 		int numberOfActions = 0;
 		State AIState = *startingPoint->mState;
-		State playerState = State(Moves::M_NONE, 0, 0/*playerPos*/);
+		State playerState = State(Moves::M_NONE, player->m_tile.row, player->m_tile.col, false);
 
 		double AIWIN = 0;
 		//During simulation the moves are chosen with respect to a function called rollout policy function (which has some biased stats)
@@ -168,7 +175,7 @@ namespace MonteCarlo {
 				AIWIN = 1.;
 				break;
 			}
-			AIState = RollOut(AIState, q, true);
+			AIState = RollOut(AIState, AI, true);
 			mAIRow = AIState.mRow;		mAIColumn = AIState.mColumn;
 
 			//player simulation turn
@@ -176,7 +183,7 @@ namespace MonteCarlo {
 				AIWIN = -1.;
 				break;
 			}
-			playerState = RollOut(playerState, q, false);
+			playerState = RollOut(playerState, AI, false);
 			mPlayerRow = playerState.mRow;		mPlayerColumn = playerState.mColumn;
 		}
 
@@ -189,29 +196,46 @@ namespace MonteCarlo {
 		//biased randomizer for next move
 		int r = rand() % 10;
 
-		if (r < 60) {
-			if (q->IsLegalMove(TileQ(currentState.mRow - 1, currentState.mColumn)))
-				return State(Moves::M_MOVE_DOWN, currentState.mRow, currentState.mColumn, AITurn);
-			else
-				return RollOut(currentState, q, AITurn); //repeat
+		if (r < 6) {
+			if (AITurn) {
+				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow - 1, currentState.mColumn)))
+					return State(Moves::M_MOVE_DOWN, currentState.mRow, currentState.mColumn, AITurn);
+				else
+					return RollOut(currentState, q, AITurn); //repeat
+			}
+			else { //human movement simulation
+				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow + 1, currentState.mColumn)))
+					return State(Moves::M_MOVE_UP, currentState.mRow, currentState.mColumn, AITurn);
+				else
+					return RollOut(currentState, q, AITurn); //repeat
+			}
 		}
 		if (r >= 6 && r < 8) {
-			if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn + 1)))
+			if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow, currentState.mColumn + 1)))
 				return State(Moves::M_MOVE_RIGHT, currentState.mRow, currentState.mColumn, AITurn);
 			else
 				return RollOut(currentState, q, AITurn); //repeat
 		}
 		if (r >= 8 && r < 10) {
-			if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn - 1)))
+			if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow, currentState.mColumn - 1)))
 				return State(Moves::M_MOVE_LEFT, currentState.mRow, currentState.mColumn, AITurn);
 			else
 				return RollOut(currentState, q, AITurn); //repeat
 		}
 		if (r == 10) {
-			if (q->IsLegalMove(TileQ(currentState.mRow + 1, currentState.mColumn)))
-				return State(Moves::M_MOVE_UP, currentState.mRow, currentState.mColumn, AITurn);
-			else
-				return RollOut(currentState, q, AITurn); //repeat
+			if (AITurn) {
+				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow + 1, currentState.mColumn)))
+					return State(Moves::M_MOVE_UP, currentState.mRow, currentState.mColumn, AITurn);
+				else
+					return RollOut(currentState, q, AITurn); //repeat
+			}
+			else {//human movement simulation
+				if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), TileQ(currentState.mRow - 1, currentState.mColumn)))
+					return State(Moves::M_MOVE_DOWN, currentState.mRow, currentState.mColumn, AITurn);
+				else
+					return RollOut(currentState, q, AITurn); //repeat
+			}
+
 		}
 		//if (r < 5)
 		//	return State(Moves::M_MOVE_UP, currentState.mRow, currentState.mColumn);
@@ -222,7 +246,7 @@ namespace MonteCarlo {
 	}
 
 	MonteCarloTree::Node::Node(Node* parent, Moves m) : mVisitedTimes(0u), mTotalSimulationReward(0.),
-	mState(new State(m, parent->mState->mRow, parent->mState->mColumn)){
+	mState(new State(m, parent->mState->mRow, parent->mState->mColumn, true)){
 		//add parent as parent pointer
 		mParent = parent;
 
@@ -236,16 +260,16 @@ namespace MonteCarlo {
 
 	void MonteCarloTree::Node::CreateChildren(QuoridorPlayer* q) {
 		//create all possible moves
-		if (q->IsLegalMove(TileQ(mState->mRow - 1, mState->mColumn)))
+		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), TileQ(mState->mRow - 1, mState->mColumn)))
 			new Node(this, Moves::M_MOVE_DOWN);
 
-		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn + 1)))
+		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), TileQ(mState->mRow, mState->mColumn + 1)))
 			new Node(this, Moves::M_MOVE_RIGHT);
 
-		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn - 1)))
+		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), TileQ(mState->mRow, mState->mColumn - 1)))
 			new Node(this, Moves::M_MOVE_LEFT);
 
-		if (q->IsLegalMove(TileQ(mState->mRow + 1, mState->mColumn)))
+		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), TileQ(mState->mRow + 1, mState->mColumn)))
 			new Node(this, Moves::M_MOVE_UP);
 
 		//if (q->IsLegalMove(TileQ(mState->mRow + 1, mState->mColumn)))

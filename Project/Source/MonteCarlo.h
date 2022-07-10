@@ -38,6 +38,8 @@ namespace MonteCarlo {
 		void ActualMove();
 
 		QuoridorPlayer* mAIPlayer;
+		QuoridorPlayer* mHumanPlayer;
+
 		Simulator* mSimulator;
 		//Member variables
 		Node* mRoot;
@@ -52,7 +54,7 @@ namespace MonteCarlo {
 
 
 	struct Simulator {
-		double Simulate(MonteCarloTree::Node* startingPoint, QuoridorPlayer* q);
+		double Simulate(MonteCarloTree::Node* startingPoint, QuoridorPlayer* AI, QuoridorPlayer* player);
 		State RollOut(const State currentState, QuoridorPlayer* q, bool AITurn);
 
 	private:

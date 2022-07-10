@@ -28,9 +28,9 @@ public:
 	unsigned GetWalls() { return m_walls; }
 	unsigned GetStairs() { return m_stairs; }
 
+	TileQ m_tile;
 private:
 	bool m_type;
-	TileQ m_tile;
 	unsigned m_walls;
 	unsigned m_stairs;
 

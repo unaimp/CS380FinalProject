@@ -19,7 +19,7 @@ Terrain::Terrain( void )
   m_width(40),
   m_quoridor_mode(0),
   m_mouse_click(false),
-  m_player_turn(true)
+  m_player_turn(false) 
 {
 	// Create new maps from Maps directory
 	WCHAR pathBuffer[MAX_PATH];

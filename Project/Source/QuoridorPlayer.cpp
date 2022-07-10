@@ -262,5 +262,6 @@ void QuoridorPlayer::Update()
 	}
 	else if(!m_type && !g_terrain.IsPlayerTurn()) {
 		g_database.mAILogic->Execute();
+		g_terrain.ChangeTurn();
 	}
 }

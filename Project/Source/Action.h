@@ -19,7 +19,7 @@ namespace MonteCarlo {
 
 
 	struct State {
-		State(Moves a, const int p_r, const int p_c, bool AI = true);
+		State(Moves a, const int p_r, const int p_c, bool AI);
 		//State of the player from where take following actions
 		int mRow;
 		int mColumn;
