@@ -424,7 +424,7 @@ void QuoridorPlayer::Update()
 
 	if (m_type && g_terrain.IsPlayerTurn())
 	{
-		//ResetTemp();
+		ResetTemp();
 
 		D3DXVECTOR3 temp = g_terrain.GetMousePos();
 
