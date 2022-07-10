@@ -92,13 +92,17 @@ void World::Initialize( CMultiAnim *pMA, std::vector< CTiny* > *pv_pChars, CSoun
 
 	{	//Agent
 		GameObject* agent = new GameObject( g_database.GetNewObjectID(), OBJECT_Player, "Player" );
-		D3DXVECTOR3 pos(0.1125f, 0.0f, 0.1375f);
-		agent->CreateBody( 100, pos );
-		agent->CreateMovement();
-		agent->CreateTiny( pMA, pv_pChars, pSM, dTimeCurrent );
+		TileQ pos(0, 6);
+		agent->CreateQuoridor( true, pos );
 		g_database.Store( *agent );
-		agent->CreateStateMachineManager();
-		agent->GetStateMachineManager()->PushStateMachine( *new Agent( *agent ), STATE_MACHINE_QUEUE_0, true );
+
+		GameObject* npc = new GameObject(g_database.GetNewObjectID(), OBJECT_Player, "NPC");
+		TileQ posnpc(12, 6);
+		//TileQ posnpc(1, 4);
+		npc->CreateQuoridor(false, posnpc);
+		g_database.Store(*npc);
+
+		//QuoridorPlayer* player = new QuoridorPlayer(g_database.GetNewObjectID(), )
 	}
 
 #if defined (PROJECT_THREE)

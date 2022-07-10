@@ -15,7 +15,8 @@ GameObject::GameObject( objectID id, unsigned int type, char* name )
   m_stateMachineManager(0),
   m_body(0),
   m_movement(0),
-  m_tiny(0)
+  m_tiny(0),
+  m_quoridor(0)
 {
 	m_id = id;
 	m_type = type;
@@ -46,6 +47,10 @@ GameObject::~GameObject( void )
 	if(m_tiny)
 	{
 		delete m_tiny;
+	}
+	if (m_quoridor)
+	{
+		delete m_quoridor;
 	}
 }
 
@@ -82,6 +87,12 @@ void GameObject::CreateTiny( CMultiAnim *pMA, std::vector< CTiny* > *pv_pChars, 
 	}
 }
 
+
+void GameObject::CreateQuoridor(bool type, TileQ pos)
+{
+	m_quoridor = new QuoridorPlayer(type, pos);
+}
+
 void GameObject::Initialize( void )
 {
 
@@ -101,6 +112,10 @@ void GameObject::Update( void )
 	if(m_stateMachineManager)
 	{
 		m_stateMachineManager->Update();
+	}
+	if (m_quoridor)
+	{
+		m_quoridor->Update();
 	}
 }
 

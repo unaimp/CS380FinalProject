@@ -94,27 +94,6 @@ void Terrain::NextMap( void )
 	ResetInfluenceMap();
 	Analyze();
 
-	GameObject* player = g_database.Find("Player");
-	GameObject* npc = g_database.Find("NPC");
-	if (player != nullptr)
-	{
-		if (m_nextMap == 0)
-		{
-			player->GetQuoridor().SetPlayerInTile(0, 6);
-			npc->GetQuoridor().SetPlayerInTile(12, 6);
-		}
-		if (m_nextMap == 1)
-		{
-			player->GetQuoridor().SetPlayerInTile(0, 1);
-			npc->GetQuoridor().SetPlayerInTile(2, 1);
-		}
-		if (m_nextMap == 2)
-		{
-			player->GetQuoridor().SetPlayerInTile(0, 2);
-			npc->GetQuoridor().SetPlayerInTile(4, 2);
-		}
-	}
-
 	g_database.SendMsgFromSystem(MSG_MapChange);
 }
 

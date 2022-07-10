@@ -138,6 +138,7 @@
     <ClCompile Include="Source\agent.cpp" />
     <ClCompile Include="Source\movement_student.cpp" />
     <ClCompile Include="Source\PathfindingTests.cpp" />
+    <ClCompile Include="Source\QuoridorPlayer.cpp" />
     <ClCompile Include="Source\Random.cpp" />
     <ClCompile Include="Source\Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -229,6 +230,7 @@
     <ClInclude Include="Source\movement.h" />
     <ClInclude Include="Source\agent.h" />
     <ClInclude Include="Source\PathfindingTests.h" />
+    <ClInclude Include="Source\QuoridorPlayer.h" />
     <ClInclude Include="Source\Random.h" />
     <ClInclude Include="Source\Stdafx.h" />
     <ClInclude Include="Source\resource.h" />

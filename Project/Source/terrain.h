@@ -67,6 +67,21 @@ public:
 	void Propagation(float decay, float growing, bool computeNegativeInfluence);
 	void NormalizeOccupancyMap(bool computeNegativeInfluence);
 
+
+	int GetPlayerQuoridorMode() { return m_quoridor_mode; }
+	void SetPlayerQuoridorMode(int mode) { m_quoridor_mode = mode; }
+
+	D3DXVECTOR3 GetMousePos() { return m_mouse_pos; }
+	void SetMousePos(D3DXVECTOR3 pos) { m_mouse_pos = pos; }
+
+	void MousClick(bool click) { m_mouse_click = click; }
+	bool IsMousClick() { return m_mouse_click; }
+
+	bool IsBlank(int r, int c) { return m_terrainColor[r][c] == DEBUG_COLOR_WHITE; }
+	
+	bool IsPlayerTurn() { return m_player_turn; }
+	void ChangeTurn() { m_player_turn = !m_player_turn; }
+
 protected:
 
 	// Map List parameters
@@ -85,6 +100,11 @@ protected:
 	D3DXVECTOR3 m_dirPlayer;
 
 	float m_timerUpdatePropagation;
+
+	int m_quoridor_mode;
+	D3DXVECTOR3 m_mouse_pos;
+	bool m_mouse_click;
+	bool m_player_turn;
 
 	void AnalyzeOpennessClosestWall(void);
 	void AnalyzeVisibility(void);

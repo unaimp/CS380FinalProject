@@ -29,6 +29,8 @@ class StateMachineManager;
 class MSG_Object;
 class Movement;
 class Body;
+class QuoridorPlayer;
+class TileQ;
 
 
 class GameObject
@@ -52,7 +54,7 @@ public:
 
 	//State machine related
 	void CreateStateMachineManager( void );
-	inline StateMachineManager* GetStateMachineManager( void )	{ ASSERTMSG(m_stateMachineManager, "GameObject::GetStateMachineManager - m_stateMachineManager not set"); return( m_stateMachineManager ); }
+	inline StateMachineManager* GetStateMachineManager( void )	{ /*ASSERTMSG(m_stateMachineManager, "GameObject::GetStateMachineManager - m_stateMachineManager not set");*/ return(m_stateMachineManager); }
 
 	//Scheduled deletion
 	inline void MarkForDeletion( void )				{ m_markedForDeletion = true; }
@@ -70,6 +72,10 @@ public:
 	void CreateTiny( CMultiAnim *pMA, std::vector< CTiny* > *pv_pChars, CSoundManager *pSM, double dTimeCurrent );
 	inline CTiny& GetTiny( void )					{ ASSERTMSG(m_tiny, "GameObject::GetModel - m_tiny not set"); return( *m_tiny ); }
 
+	//Quoridor
+	void CreateQuoridor(bool type, TileQ pos);
+	inline QuoridorPlayer& GetQuoridor(void) { return(*m_quoridor); }
+
 private:
 
 	objectID m_id;									//Unique id of object (safer than a pointer).
@@ -83,5 +89,8 @@ private:
 	Body* m_body;
 	CTiny* m_tiny;
 	StateMachineManager* m_stateMachineManager;
+	
+	
+	QuoridorPlayer* m_quoridor;
 
 };

@@ -14,6 +14,7 @@
 
 enum Tile
 {
+	TILE_IN_BETWEEN = -2,
 	TILE_WALL = -1,
 	TILE_EMPTY,
 	TILE_WALL_INVISIBLE,

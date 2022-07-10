@@ -56,6 +56,7 @@ void Map::Serialize(const std::wstring& filename)
 			switch (val)
 			{
 			case TILE_EMPTY:
+			case TILE_IN_BETWEEN:
 			case TILE_WALL:
 				m_terrain[r][c] = (Tile)val;
 				break;

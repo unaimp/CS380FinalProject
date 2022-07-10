@@ -163,6 +163,9 @@
     <ClCompile Include="Source\Enemy_student.cpp">
       <Filter>GameObject\StateMachines</Filter>
     </ClCompile>
+    <ClCompile Include="Source\QuoridorPlayer.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\body.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="Source\Enemy.h">
       <Filter>GameObject\StateMachines</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\QuoridorPlayer.h">
+      <Filter>GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

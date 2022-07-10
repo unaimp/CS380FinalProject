@@ -73,5 +73,8 @@
 
 #include <PathfindingTests.h>
 
+
+#include <QuoridorPlayer.h>     // final project
+
 #pragma warning(default: 4005)
 #pragma warning(default: 4995)

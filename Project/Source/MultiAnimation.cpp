@@ -114,6 +114,10 @@ D3DXVECTOR3				g_click3D;
 #define	IDC_SAMPLETESTPRE		45
 #define	IDC_SAMPLETESTNEXT		46
 
+#define IDC_QUORY_MOVE          50
+#define IDC_QUORY_WALL          51
+#define IDC_QUORY_STAIR         52
+
 //--------------------------------------------------------------------------------------
 // Forward declarations
 //--------------------------------------------------------------------------------------
@@ -253,9 +257,13 @@ void InitApp()
 	int iY = 10;
 	g_SampleUI.SetCallback(OnGUIEvent);
 
-	g_SampleUI.AddButton(IDC_NEXTMAP, L"Next Map", 45, iY, 120, 24);
+	g_SampleUI.AddButton(IDC_QUORY_MOVE, L"Player Quoridor Action", 45, iY, 120, 24);
+
+	g_SampleUI.AddButton(IDC_NEXTMAP, L"Next Map", 45, iY += 52, 120, 24);
+
+	/*
 	//g_SampleUI.AddButton(IDC_TOGGLECAM, L"Toggle Camera", 45, iY += 26, 120, 24);
-	g_SampleUI.AddButton(IDC_TOGGLEHEURISTICWEIGHT, L"Toggle Weight", 45, iY += 26, 120, 24);
+	g_SampleUI.AddButton(IDC_TOGGLEHEURISTICWEIGHT, L"Toggle Weight", 45, iY += 52, 120, 24);
 	g_SampleUI.AddButton(IDC_TOGGLEHEURISTIC, L"Toggle Heuristic", 45, iY += 26, 120, 24);
 	g_SampleUI.AddButton(IDC_TOGGLESMOOTHING, L"Toggle Smoothing", 45, iY += 26, 120, 24);
 	g_SampleUI.AddButton(IDC_TOGGLERUBBERBANDING, L"Toggle Rubberbanding", 45, iY += 26, 120, 24);
@@ -276,6 +284,8 @@ void InitApp()
 #if defined (EXTRACREDIT_ROYFLOYDWARSHALL) || defined (EXTRACREDIT_GOALBOUNDING) || defined (EXTRACREDIT_JPSPLUS) || defined (EXTRACREDIT_FOGOFWAR)
 	g_ExtraTestsUI.AddButton(IDC_TOGGLEEXTRACREDIT, L"Extra Credit", 45, iY += 26, 120, 24);
 #endif
+	*/
+
 
 #if defined (PROJECT_THREE)
 	// Project 3 terrain analysis
@@ -822,12 +832,47 @@ void RenderText()
 	//txtHelper.DrawFormattedTextLine( L"  Time: %2.3f", DXUTGetGlobalTimer()->GetTime() );
 	//txtHelper.DrawFormattedTextLine( L"  Number of models: %d", g_v_pCharacters.size() );
 
-	// Print out Heuristic Weight
+	// Print out Player Coords
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	txtHelper.SetInsertionPos(5, y);
-	txtHelper.DrawFormattedTextLine(L"Map Index:                 %d", g_terrain.GetMapIndex());
+	QuoridorPlayer player = g_database.Find("Player")->GetQuoridor();
+	TileQ tile_player = player.GetTile();
+	txtHelper.DrawFormattedTextLine(L"Player Row:                %d", tile_player.row);
+	txtHelper.SetInsertionPos(5, y += 10);
+	txtHelper.DrawFormattedTextLine(L"Player Col:                  %d", tile_player.col);
 
-	// Print out Heuristic Weight
+	// Print out Player stats
+	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	txtHelper.SetInsertionPos(5, y += 10);
+	txtHelper.DrawFormattedTextLine(L"Player Walls:             %d", player.GetWalls());
+	txtHelper.SetInsertionPos(5, y += 10);
+	txtHelper.DrawFormattedTextLine(L"Player Stairs:            %d", player.GetStairs());
+
+	// Print out Player Order case
+	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	txtHelper.SetInsertionPos(5, y += 20);
+	int mode = g_terrain.GetPlayerQuoridorMode();
+	if (mode == 0) { txtHelper.DrawFormattedTextLine(L"Player is set to:         Move"); }
+	else if (mode == 1) { txtHelper.DrawFormattedTextLine(L"Player is set to:         Place a Wall"); }
+	else { txtHelper.DrawFormattedTextLine(L"Player is set to:         Place a Stair"); }
+
+	// Print out NPC Coords
+	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	txtHelper.SetInsertionPos(5, y += 20);
+	QuoridorPlayer npc = g_database.Find("NPC")->GetQuoridor();
+	TileQ tile_npc = npc.GetTile();
+	txtHelper.DrawFormattedTextLine(L"NPC Row:                   %d", tile_npc.row);
+	txtHelper.SetInsertionPos(5, y += 10);
+	txtHelper.DrawFormattedTextLine(L"NPC Col:                     %d", tile_npc.col);
+
+	// Print out NPC stats
+	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	txtHelper.SetInsertionPos(5, y += 10);
+	txtHelper.DrawFormattedTextLine(L"NPC Walls:                %d", npc.GetWalls());
+	txtHelper.SetInsertionPos(5, y += 10);
+	txtHelper.DrawFormattedTextLine(L"NPC Stairs:               %d", npc.GetStairs());
+
+	/*// Print out Heuristic Weight
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	txtHelper.SetInsertionPos(5, y += 10);
 	txtHelper.DrawFormattedTextLine(L"Heuristic Weight:     %.2f", g_heuristicWeight);
@@ -905,39 +950,43 @@ void RenderText()
 	dbCompositionList::iterator i;
 	for (i = list.begin(); i != list.end(); ++i)
 	{
-		StateMachine* pStateMachine = (*i)->GetStateMachineManager()->GetStateMachine(STATE_MACHINE_QUEUE_0);
-		if (pStateMachine)
+		StateMachineManager* pStateMachineManager = (*i)->GetStateMachineManager();
+		if (pStateMachineManager)
 		{
-			char* name = (*i)->GetName();
-			char* statename = pStateMachine->GetCurrentStateNameString();
-			char* substatename = pStateMachine->GetCurrentSubstateNameString();
-			TCHAR* unicode_name = new TCHAR[strlen(name) + 1];
-			TCHAR* unicode_statename = new TCHAR[strlen(statename) + 1];
-			TCHAR* unicode_substatename = new TCHAR[strlen(substatename) + 1];
-			mbstowcs(unicode_name, name, strlen(name) + 1);
-			mbstowcs(unicode_statename, statename, strlen(statename) + 1);
-			mbstowcs(unicode_substatename, substatename, strlen(substatename) + 1);
-			if (substatename[0] != 0)
+			StateMachine* pStateMachine = pStateMachineManager->GetStateMachine(STATE_MACHINE_QUEUE_0);
+			if (pStateMachine)
 			{
-				txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-				txtHelper.SetInsertionPos(5, starttext - 1 + (12 * count));
-				txtHelper.DrawFormattedTextLine(L"%s:                          %s, %s", unicode_name, unicode_statename, unicode_substatename);
-				txtHelper.SetForegroundColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-				txtHelper.SetInsertionPos(4, starttext + (12 * count++));
-				txtHelper.DrawFormattedTextLine(L"%s:                          %s, %s", unicode_name, unicode_statename, unicode_substatename);
+				char* name = (*i)->GetName();
+				char* statename = pStateMachine->GetCurrentStateNameString();
+				char* substatename = pStateMachine->GetCurrentSubstateNameString();
+				TCHAR* unicode_name = new TCHAR[strlen(name) + 1];
+				TCHAR* unicode_statename = new TCHAR[strlen(statename) + 1];
+				TCHAR* unicode_substatename = new TCHAR[strlen(substatename) + 1];
+				mbstowcs(unicode_name, name, strlen(name) + 1);
+				mbstowcs(unicode_statename, statename, strlen(statename) + 1);
+				mbstowcs(unicode_substatename, substatename, strlen(substatename) + 1);
+				if (substatename[0] != 0)
+				{
+					txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+					txtHelper.SetInsertionPos(5, starttext - 1 + (12 * count));
+					txtHelper.DrawFormattedTextLine(L"%s:                          %s, %s", unicode_name, unicode_statename, unicode_substatename);
+					txtHelper.SetForegroundColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+					txtHelper.SetInsertionPos(4, starttext + (12 * count++));
+					txtHelper.DrawFormattedTextLine(L"%s:                          %s, %s", unicode_name, unicode_statename, unicode_substatename);
+				}
+				else
+				{
+					txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+					txtHelper.SetInsertionPos(4, starttext - 1 + (12 * count));
+					txtHelper.DrawFormattedTextLine(L"%s:                          %s", unicode_name, unicode_statename);
+					txtHelper.SetForegroundColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+					txtHelper.SetInsertionPos(5, starttext + (12 * count++));
+					txtHelper.DrawFormattedTextLine(L"%s:                          %s", unicode_name, unicode_statename);
+				}
+				delete unicode_name;
+				delete unicode_statename;
+				delete unicode_substatename;
 			}
-			else
-			{
-				txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-				txtHelper.SetInsertionPos(4, starttext - 1 + (12 * count));
-				txtHelper.DrawFormattedTextLine(L"%s:                          %s", unicode_name, unicode_statename);
-				txtHelper.SetForegroundColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-				txtHelper.SetInsertionPos(5, starttext + (12 * count++));
-				txtHelper.DrawFormattedTextLine(L"%s:                          %s", unicode_name, unicode_statename);
-			}
-			delete unicode_name;
-			delete unicode_statename;
-			delete unicode_substatename;
 		}
 	}
 
@@ -1180,7 +1229,7 @@ void RenderText()
 		//else
 		//    txtHelper.DrawTextLine( L"\n"
 		//                            L"Quit: Esc" );
-	}
+	}*/
 
 	txtHelper.End();
 }
@@ -1234,6 +1283,42 @@ LRESULT CALLBACK MsgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, boo
 		{
 			place_occupancy = true;
 		}
+
+		IDirect3DDevice9* dev = DXUTGetD3D9Device();
+
+		g_click2D.x = (float)LOWORD(lParam);
+		g_click2D.y = (float)HIWORD(lParam);
+
+		D3DVIEWPORT9 vp;
+		dev->GetViewport(&vp);
+
+		D3DXMATRIX world;
+		D3DXMatrixIdentity(&world);
+
+		D3DXMATRIX view;
+		dev->GetTransform(D3DTS_VIEW, &view);
+
+		D3DXMATRIX projection;
+		dev->GetTransform(D3DTS_PROJECTION, &projection);
+
+		D3DXVECTOR3 nearClick3D;
+		D3DXVECTOR3 farClick3D;
+
+		g_click2D.z = vp.MinZ;
+		D3DXVec3Unproject(&nearClick3D, &g_click2D, &vp, &projection, &view, &world);
+
+		g_click2D.z = vp.MaxZ;
+		D3DXVec3Unproject(&farClick3D, &g_click2D, &vp, &projection, &view, &world);
+
+		D3DXVECTOR3 ray = farClick3D - nearClick3D;
+		if (ray.y != 0.0f)
+		{
+			g_click3D = nearClick3D + (-nearClick3D.y / ray.y) * ray;
+		}
+
+		g_click3D.y = 0.0f;
+
+		g_terrain.SetMousePos(g_click3D);
 	}
 
 	if (uMsg == WM_LBUTTONDOWN ||
@@ -1242,6 +1327,8 @@ LRESULT CALLBACK MsgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, boo
 		(uMsg == WM_MOUSEMOVE && g_usermodifywalls)
 		)
 	{
+		g_terrain.MousClick(true);
+
 		bool lHold = static_cast<bool>(wParam == MK_LBUTTON);
 		bool rHold = static_cast<bool>(wParam == MK_RBUTTON);
 
@@ -1357,6 +1444,9 @@ LRESULT CALLBACK MsgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, boo
 		return 0;
 	}
 
+	if (uMsg == WM_LBUTTONUP)
+		g_terrain.MousClick(false);
+
 	// Pass messages to camera class for camera movement if the
 	// global camera if active
 
@@ -1448,6 +1538,13 @@ void CALLBACK OnGUIEvent(UINT nEvent, int nControlID, CDXUTControl* pControl, vo
 					break;
 					*/
 	}
+
+	case IDC_QUORY_MOVE:
+		if (g_terrain.GetPlayerQuoridorMode() == 2)
+			g_terrain.SetPlayerQuoridorMode(0);
+		else
+			g_terrain.SetPlayerQuoridorMode(g_terrain.GetPlayerQuoridorMode()+1);
+		break;
 
 	case IDC_NEXTMAP:
 		g_terrain.NextMap();
