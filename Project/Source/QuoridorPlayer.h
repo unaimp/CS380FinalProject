@@ -3,8 +3,10 @@
 struct TileQ
 {
 	int row, col;
-	TileQ(): row(0), col(0) {}
-	TileQ(int r, int c): row(r), col(c) {}
+	bool half_row, half_col;
+	TileQ(): row(0), col(0), half_row(false), half_col(false) {}
+	TileQ(int r, int c): row(r), col(c), half_row(false), half_col(false) {}
+	TileQ(int r, int c, bool hr, bool hc): row(r), col(c), half_row(hr), half_col(hc) {}
 };
 
 class QuoridorPlayer
@@ -20,9 +22,13 @@ public:
 	void SetTile(TileQ tile, bool ontile);
 	void SetTileTemp(TileQ tile);
 
+	void SetWall(TileQ tile);
+	void SetWallTemp(TileQ tile);
+
 	void ResetTemp();
 
 	bool IsLegalMove(TileQ origin_tile, TileQ tile);
+	bool IsLegalWall(TileQ origin_tile, TileQ tile);
 
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }

@@ -82,6 +82,9 @@ public:
 	bool IsPlayerTurn() { return m_player_turn; }
 	void ChangeTurn() { m_player_turn = !m_player_turn; }
 
+	void SetTerrainTile(int r, int c, Tile t) { m_terrain[r][c] = t; }
+	Tile GetTerrainTile(int r, int c) { return m_terrain[r][c]; }
+
 protected:
 
 	// Map List parameters

@@ -1540,7 +1540,7 @@ void CALLBACK OnGUIEvent(UINT nEvent, int nControlID, CDXUTControl* pControl, vo
 	}
 
 	case IDC_QUORY_MOVE:
-		if (g_terrain.GetPlayerQuoridorMode() == 2)
+		if (g_terrain.GetPlayerQuoridorMode() == 1)
 			g_terrain.SetPlayerQuoridorMode(0);
 		else
 			g_terrain.SetPlayerQuoridorMode(g_terrain.GetPlayerQuoridorMode()+1);

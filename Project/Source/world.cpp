@@ -138,6 +138,8 @@ void World::Update()
 {
 	g_clock.MarkTimeThisTick();
 	g_database.Update();
+	if (g_terrain.IsMousClick())
+		g_terrain.MousClick(false);
 }
 
 void World::Animate( double dTimeDelta )

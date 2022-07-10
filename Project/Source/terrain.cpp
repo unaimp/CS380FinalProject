@@ -177,13 +177,13 @@ void Terrain::UpdatePlayerPos( D3DXVECTOR3& pos, D3DXVECTOR3& dir )
 
 void Terrain::SetColor( int r, int c, DebugDrawingColor color )
 {
-	if( m_terrain[r][c] >= 0 )
+	if( m_terrain[r][c] >= 0 || m_terrain[r][c] == TILE_IN_BETWEEN)
 	{
 		m_terrainColor[r][c] = color;
 	}
 	else if (m_terrain[r][c] == -1)
 	{
-		ASSERTMSG( 0, "Can't set color to a grid square that is a wall" );
+		//ASSERTMSG( 0, "Can't set color to a grid square that is a wall" );
 	}
 }
 
