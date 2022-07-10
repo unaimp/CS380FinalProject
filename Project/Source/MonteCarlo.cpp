@@ -50,6 +50,8 @@ namespace MonteCarlo {
 	void MonteCarloTree::Execute(void) {
 		Start();
 
+		srand(time(nullptr));
+
 		while (mCurrentIterations < mMaximumIterations) {
 			mCurrentIterations++;
 
