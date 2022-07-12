@@ -85,12 +85,18 @@ public:
 	void SetTerrainTile(int r, int c, Tile t) { m_terrain[r][c] = t; }
 	Tile GetTerrainTile(int r, int c) { return m_terrain[r][c]; }
 
+	void CloneMap();
+	bool IsWallClone(int r, int c);
+	Map& GetCloneMap() { return m_map_clone; }
+
 protected:
 
 	// Map List parameters
 	int m_nextMap;
 	typedef std::vector<Map> MapList;
 	MapList m_maps;
+
+	Map m_map_clone;
 
 	// Parameters for current map
 	int m_width;

@@ -83,7 +83,10 @@ void Terrain::NextMap( void )
 	assert(m_maps.size() && "No maps loaded");
 	m_nextMap = ++m_nextMap % m_maps.size();
 
+
 	Map& map = m_maps[m_nextMap];
+	map.Serialize(map.GetFileName());
+	m_map_clone.Serialize(map.GetFileName());
 	m_width = map.GetWidth();
 	m_terrain = map.GetTerrain();
 	m_terrainColor = map.GetTerrainColor();
@@ -116,6 +119,36 @@ void Terrain::NextMap( void )
 	}
 
 	g_database.SendMsgFromSystem(MSG_MapChange);
+}
+
+void Terrain::CloneMap()
+{
+	for (int r = 0; r < m_width; r++)
+	{
+		for (int c = 0; c < m_width; c++)
+		{
+			m_map_clone.UpdateMaps(r, c, m_terrain[r][c], m_terrainColor[r][c], m_terrainInfluenceMap[r][c]);
+		}
+	}
+}
+
+bool Terrain::IsWallClone(int r, int c)
+{
+	if (m_map_clone.GetTile(r,c) == TILE_WALL)
+		return true;
+
+	if (r != 0 && r != m_width - 1)
+	{
+		if (m_map_clone.GetTile(r-1, c) == TILE_WALL && m_map_clone.GetTile(r+1, c) == TILE_WALL)
+			return true;
+	}
+
+	if (c != 0 && c != m_width - 1)
+	{
+		if (m_map_clone.GetTile(r, c-1) == TILE_WALL && m_map_clone.GetTile(r, c+1) == TILE_WALL)
+			return true;
+	}
+	return false;
 }
 
 Map *Terrain::GetCurrentMap(void) 

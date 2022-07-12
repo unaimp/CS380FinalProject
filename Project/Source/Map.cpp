@@ -35,8 +35,8 @@ void Map::Serialize(const std::wstring& filename)
 	std::ifstream in(filename.c_str());
 
 	assert(in.good() && "File not found");
-	assert(!m_width && !m_terrain && !m_terrainColor &&
-		!m_terrainInfluenceMap && "Map may already have data");
+	//assert(!m_width && !m_terrain && !m_terrainColor &&
+	//	!m_terrainInfluenceMap && "Map may already have data");
 
 	// width is stored first
 	in >> m_width;
@@ -93,7 +93,7 @@ float** Map::GetInfluenceMap() const
 	return m_terrainInfluenceMap;
 }
 
-void Map::PlaceWall(int &row, int &col)
+void Map::PlaceWall(int row, int col)
 {
 	if (row < 0 || row >= m_width)
 		return;
@@ -101,8 +101,8 @@ void Map::PlaceWall(int &row, int &col)
 		return;
 
 	Tile &curTile = m_terrain[row][col];
-	if (curTile != Tile::TILE_EMPTY)
-		return;
+	//if (curTile != Tile::TILE_EMPTY)
+	//	return;
 
 	curTile = Tile::TILE_WALL;
 }
@@ -149,4 +149,11 @@ void Map::SaveMap(void)
 	}
 
 	out.close();
+}
+
+void Map::UpdateMaps(int r, int c, Tile tile, DebugDrawingColor color, float influence)
+{
+	m_terrain[r][c] = tile;
+	m_terrainColor[r][c] = color;
+	m_terrainInfluenceMap[r][c] = influence;
 }

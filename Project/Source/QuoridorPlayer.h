@@ -30,9 +30,38 @@ public:
 	bool IsLegalMove(TileQ origin_tile, TileQ tile);
 	bool IsLegalWall(TileQ origin_tile, TileQ tile);
 
+	bool IsLegalWallAfterPathfinding(TileQ origin_tile, TileQ tile);
+	void SetWallClone(TileQ tile);
+
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }
 	unsigned GetStairs() { return m_stairs; }
+
+	// Pathfinding stuff
+	struct a_node_data
+	{
+		int parentRow; // Parent node (-1 is start node)
+		int parentCol; // Parent node (-1 is start node)
+
+		float cost;    // Cost to get this node, g(x)
+
+		float total;   // Total cost, g(x) + h(x)
+
+		bool onOpen;   // On Open List
+		bool onClosed; // On Closed List
+
+		a_node_data() : parentRow(-1), parentCol(-1), cost(INFINITY), total(INFINITY), onOpen(false), onClosed(false) {}
+	};
+
+	bool PathCheck(int r0, int c0, int r1, int r2);
+	bool IsClearPath(int r0, int c0, int r1, int c1);
+	float HeuristicCost(int fr, int fc, int r, int c);
+	int GetCheapestNode(int* parentR, int* parentC);
+	void IdToCoords(int id, int width, int* r, int* c);
+	float AdjacentChildCost(int or , int oc, int r, int c);
+	bool IsDiagonal(int or , int oc, int r, int c);
+	void AFillWaypoint(int r, int c);
+	bool WallCheck(int or , int oc, int r, int c);
 
 	TileQ m_tile;
 private:
@@ -40,4 +69,11 @@ private:
 	unsigned m_walls;
 	unsigned m_stairs;
 
+	// Pathfinding variables
+	int m_width;
+	std::vector<a_node_data> m_nodes;
+
+	std::vector<int> m_open_list;
+	std::vector<int> m_closed_list;
+	std::list<D3DXVECTOR3> m_waypointList;
 };

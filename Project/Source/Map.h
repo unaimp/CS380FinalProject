@@ -33,7 +33,9 @@ private:
 	void InitArray(T**& t)
 	{
 		assert(m_width > 0 && "Invalid width for map");
-		assert(!t && "Map data may already be initialized!");
+		//assert(!t && "Map data may already be initialized!");
+		if (t)
+			DestroyArray(t);
 
 		t = new T*[m_width];
 		for (int i = 0; i < m_width; ++i)
@@ -64,7 +66,10 @@ public:
 	DebugDrawingColor** GetTerrainColor() const;
 	float** GetInfluenceMap() const;
 
-	void PlaceWall(int &row, int &col);
+	void UpdateMaps(int r, int c, Tile tile, DebugDrawingColor color, float influence);
+	Tile GetTile(int r, int c) { return m_terrain[r][c]; }
+
+	void PlaceWall(int row, int col);
 	void RemoveWall(int &row, int &col);
 	void SaveMap(void);
 	inline std::wstring GetFileName(void) { return m_filename; };
