@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(1000),
+		mMaximumIterations(3000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -299,8 +299,9 @@ namespace MonteCarlo {
 		}
 		else {
 			//erase this possibility from the vector
+			Moves movetoDelete = posibleMoves[randomNumber];
 			for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
-				if (*it == posibleMoves[randomNumber]) {
+				if (*it == movetoDelete) {
 					it = posibleMoves.erase(it);
 				}
 				else {
