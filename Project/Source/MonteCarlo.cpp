@@ -149,7 +149,11 @@ namespace MonteCarlo {
 		}
 		else {
 			//create this node children actions and rollout from one of them
-			leafNode->CreateChildren(mAIPlayer);
+			if(leafNode->mAI)
+				leafNode->CreateChildren(mHumanPlayer);
+			else
+				leafNode->CreateChildren(mAIPlayer);
+
 			return leafNode->mChildren[0];
 		}
 	}
@@ -321,29 +325,31 @@ namespace MonteCarlo {
 	}
 
 	void MonteCarloTree::Node::CreateChildren(QuoridorPlayer* q) {
+		//get grandparent node (the previous move for the plyaer)
 		Node* grandParent = this->mParent ? this->mParent : nullptr;
-		
-		State previousState = grandParent ? grandParent->mState : State()
+		//if not grandparent get current board position state
+		State previousState = grandParent ? *grandParent->mState 
+			: State(q->GetTile(), !this->mAI, false);
 
-		TileQ up(mState->mRow - 1, mState->mColumn);
-		TileQ right(mState->mRow, mState->mColumn + 1);
-		TileQ left(mState->mRow, mState->mColumn - 1);
-		TileQ down(mState->mRow + 1, mState->mColumn);
+		TileQ up(previousState.mRow + 1, previousState.mColumn);
+		TileQ right(previousState.mRow, previousState.mColumn + 1);
+		TileQ left(previousState.mRow, previousState.mColumn - 1);
+		TileQ down(previousState.mRow - 1, previousState.mColumn);
 
 		//create all possible moves
-		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), up))
-			new Node(this, up, false, !this->mAI);
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), up))
+			new Node(this, up, false, previousState.mAI);
 
 		//wall placement
 		//new Node(this, TileQ(this->mState->mRow, this->mState->mColumn), true, , !this->mAI);
 
-		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), right))
-			new Node(this, right, false, !this->mAI);
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), right))
+			new Node(this, right, false, previousState.mAI);
 		//
-		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), left))
-			new Node(this, left, false, !this->mAI);
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), left))
+			new Node(this, left, false, previousState.mAI);
 		//
-		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), down))
-			new Node(this, down, false, !this->mAI);
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), down))
+			new Node(this, down, false, previousState.mAI);
 	}
 }
