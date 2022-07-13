@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(100),
+		mMaximumIterations(1000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
