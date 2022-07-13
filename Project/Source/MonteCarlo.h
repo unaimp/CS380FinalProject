@@ -8,7 +8,7 @@ namespace MonteCarlo {
 	public:
 		struct Node {
 			Node();
-			Node(Node* parent, Moves m = Moves::M_NONE);
+			Node(Node* parent, TileQ tile, bool wallPlacement);
 			~Node();
 
 			void CreateChildren(QuoridorPlayer* q);
@@ -55,10 +55,12 @@ namespace MonteCarlo {
 
 	struct Simulator {
 		double Simulate(MonteCarloTree::Node* startingPoint, QuoridorPlayer* AI, QuoridorPlayer* player);
-		State& RollOut(const State currentState, QuoridorPlayer* q, bool AITurn, bool fwdNOT, bool rightNOT, bool leftNOT);
+		State& RollOut(const State currentState, QuoridorPlayer* q, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
 
 	private:
 		int mPlayerRow, mPlayerColumn;
 		int mAIRow, mAIColumn;
+
+		void PlaceWall() {};
 	};
 }
