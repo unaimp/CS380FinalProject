@@ -27,7 +27,7 @@ public:
 
 	void ResetTemp();
 
-	bool IsLegalMove(TileQ origin_tile, TileQ tile);
+	bool IsLegalMove(TileQ origin_tile, TileQ& tile);
 	bool IsLegalWall(TileQ origin_tile, TileQ tile);
 
 	bool IsLegalWallAfterPathfinding(TileQ origin_tile, TileQ tile);

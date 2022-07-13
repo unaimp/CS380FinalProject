@@ -207,7 +207,7 @@ void QuoridorPlayer::ResetTemp()
 	}
 }
 
-bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
+bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ& tile)
 {
 	TileQ bottom_left_tile(tile.row * 3, tile.col * 3);
 
@@ -216,34 +216,194 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	// Moving left check
 	if (origin_tile.col != 0)
 	{
-		if (origin_tile.row == tile.row && origin_tile.col-1 == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col+2) &&
-			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col) )
+		if (origin_tile.row == tile.row && origin_tile.col - 1 == tile.col &&
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2))
+		{
+			if(!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			{
+				// Normal left skip
+				if (tile.col != 0 && !g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1))   // No second wall
+					tile.col -= 1;
+				// Diagonal left skip
+				else
+				{
+					if (g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col)) // There's a wall up
+						tile.row -= 1;
+					else if (g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col)) // There's a wall down
+						tile.row += 1;
+					// If this is the player
+					else if (m_type)
+					{
+						D3DXVECTOR3 temp = g_terrain.GetMousePos();
+						TileQ target;
+						g_terrain.GetRowColumn(&temp, &target.row, &target.col);
+
+						// Bounce down
+						if (target.row % 3 == 0)
+							tile.row -= 1;
+						// Bounce up
+						if (target.row % 3 == 1)
+							tile.row += 1;
+					}
+					// If this is the npc
+					else
+					{
+						srand(time(NULL));
+						if(rand() % 2 == 0)
+							tile.row -= 1;
+						else
+							tile.row += 1;
+					}
+				}
+			}
 			return true;
+		}
 	}
 	// Moving right check
 	if (origin_tile.col != width)
 	{
 		if (origin_tile.row == tile.row && origin_tile.col+1 == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-1) &&
-			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-1))
+		{
+			if (!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			{
+				// Normal right skip
+				if (tile.col != width && !g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2))   // No second wall
+					tile.col += 1;
+				// Diagonal right skip
+				else
+				{
+					if (g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col)) // There's a wall up
+						tile.row -= 1;
+					else if (g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col)) // There's a wall down
+						tile.row += 1;
+					// If this is the player
+					else if (m_type)
+					{
+						D3DXVECTOR3 temp = g_terrain.GetMousePos();
+						TileQ target;
+						g_terrain.GetRowColumn(&temp, &target.row, &target.col);
+
+						// Bounce down
+						if (target.row % 3 == 0)
+							tile.row -= 1;
+						// Bounce up
+						if (target.row % 3 == 1)
+							tile.row += 1;
+					}
+					// If this is the npc
+					else
+					{
+						srand(time(NULL));
+						if (rand() % 2 == 0)
+							tile.row -= 1;
+						else
+							tile.row += 1;
+					}
+				}
+			}
 			return true;
+		}
 	}
 	// Moving down check
 	if (origin_tile.row != 0)
 	{
 		if (origin_tile.row-1 == tile.row && origin_tile.col == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row+2, bottom_left_tile.col) &&
-			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			!g_terrain.IsWall(bottom_left_tile.row+2, bottom_left_tile.col))
+		{
+			if (!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			{
+				// Normal down skip
+				if (tile.row != 0 && !g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col))   // No second wall
+					tile.row -= 1;
+				// Diagonal down skip
+				else
+				{
+					if (g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1)) // There's a wall right
+						tile.col -= 1;
+					else if (g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2)) // There's a wall left
+						tile.col += 1;
+					// If this is the player
+					else if (m_type)
+					{
+						D3DXVECTOR3 temp = g_terrain.GetMousePos();
+						TileQ target;
+						g_terrain.GetRowColumn(&temp, &target.row, &target.col);
+
+						// Bounce down
+						if (target.col % 3 == 0)
+							tile.col -= 1;
+						// Bounce up
+						if (target.row % 3 == 1)
+							tile.col += 1;
+					}
+					// If this is the npc
+					else
+					{
+						srand(time(NULL));
+						if (rand() % 2 == 0)
+							tile.col -= 1;
+						else
+							tile.col += 1;
+					}
+				}
+			}
 			return true;
+		}
 	}
 	// Moving up check
 	if (origin_tile.row != width)
 	{
 		if (origin_tile.row+1 == tile.row && origin_tile.col == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row-1, bottom_left_tile.col) &&
-			g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			!g_terrain.IsWall(bottom_left_tile.row-1, bottom_left_tile.col))
+		{
+			if (!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
+			{
+				// Normal up skip
+				if (tile.row != width && !g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col))   // No second wall
+					tile.row += 1;
+				// Diagonal up skip
+				else
+				{
+					if (g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1)) // There's a wall right
+						tile.col -= 1;
+					else if (g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1) &&
+						!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2)) // There's a wall left
+						tile.col += 1;
+					// If this is the player
+					else if (m_type)
+					{
+						D3DXVECTOR3 temp = g_terrain.GetMousePos();
+						TileQ target;
+						g_terrain.GetRowColumn(&temp, &target.row, &target.col);
+
+						// Bounce down
+						if (target.col % 3 == 0)
+							tile.col -= 1;
+						// Bounce up
+						if (target.row % 3 == 1)
+							tile.col += 1;
+					}
+					// If this is the npc
+					else
+					{
+						srand(time(NULL));
+						if (rand() % 2 == 0)
+							tile.col -= 1;
+						else
+							tile.col += 1;
+					}
+				}
+			}
 			return true;
+		}
 	}
 
 
@@ -252,8 +412,8 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.col > 1)
 	{
 		if (origin_tile.row == tile.row && origin_tile.col-2 == tile.col &&    // Target is this case
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col+5) && // No first wall
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col+2) && // No second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col+5) && // No first wall
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col+2) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col+3))  // There's a player to skip over
 			return true;
 	}
@@ -261,8 +421,8 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.col < (width-1))
 	{
 		if (origin_tile.row == tile.row && origin_tile.col+2 == tile.col &&    // Target is this case
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-4) && // No first wall
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-1) && // No second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col-4) && // No first wall
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col-1) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col-2))  // There's a player to skip over
 			return true;
 	}
@@ -270,8 +430,8 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.row > 1)
 	{
 		if (origin_tile.row-2 == tile.row && origin_tile.col == tile.col &&    // Target is this case
-			!g_terrain.IsWall(bottom_left_tile.row+5, bottom_left_tile.col) && // No first wall
-			!g_terrain.IsWall(bottom_left_tile.row+2, bottom_left_tile.col) && // No second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row+5, bottom_left_tile.col) && // No first wall
+			!g_terrain.IsWallClone(bottom_left_tile.row+2, bottom_left_tile.col) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row+3, bottom_left_tile.col))  // There's a player to skip over
 			return true;
 	}
@@ -279,8 +439,8 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.row < (width-1))
 	{
 		if (origin_tile.row+2 == tile.row && origin_tile.col == tile.col &&    // Target is this case
-			!g_terrain.IsWall(bottom_left_tile.row-4, bottom_left_tile.col) && // No first wall
-			!g_terrain.IsWall(bottom_left_tile.row-1, bottom_left_tile.col) && // No second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row-4, bottom_left_tile.col) && // No first wall
+			!g_terrain.IsWallClone(bottom_left_tile.row-1, bottom_left_tile.col) && // No second wall
 			!g_terrain.IsBlank(bottom_left_tile.row-2, bottom_left_tile.col))  // There's a player to skip over
 			return true;
 	}
@@ -292,16 +452,16 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.col != 0)
 	{
 		if (abs(origin_tile.row - tile.row) == 1 && origin_tile.col - 1 == tile.col &&             // Target is of this case
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col - 1) &&                   // No first wall
-			(tile.col == 0 || g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col - 4)) && // Yes second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1) &&                   // No first wall
+			(tile.col == 0 || g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 4)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col - 2))                    // There's a player to skip over
 
 		{
 			// Case for rebound down
-			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
+			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound up
-			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
+			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col - 1))
 				return true;
 		}
 	}
@@ -309,16 +469,16 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.col != width)
 	{
 		if (abs(origin_tile.row - tile.row) == 1 && origin_tile.col + 1 == tile.col &&                 // Target is of this case
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col + 2) &&                       // No first wall
-			(tile.col == width || g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col + 5)) && // Yes second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2) &&                       // No first wall
+			(tile.col == width || g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 5)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col + 3))                        // There's a player to skip over
 
 		{
 			// Case for rebound down
-			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col + 3))
+			if (origin_tile.row != 0 && origin_tile.row - 1 == tile.row && !g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col + 3))
 				return true;
 			// Case for rebound up
-			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col + 3))
+			if (origin_tile.row != width && origin_tile.row + 1 == tile.row && !g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col + 3))
 				return true;
 		}
 	}
@@ -326,16 +486,16 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.row != 0)
 	{
 		if (abs(origin_tile.col - tile.col) == 1 && origin_tile.row - 1 == tile.row &&             // Target is of this case
-			!g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col) &&                   // No first wall
-			(tile.row == 0 || g_terrain.IsWall(bottom_left_tile.row - 4, bottom_left_tile.col)) && // Yes second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col) &&                   // No first wall
+			(tile.row == 0 || g_terrain.IsWallClone(bottom_left_tile.row - 4, bottom_left_tile.col)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row - 2, bottom_left_tile.col))                    // There's a player to skip over
 
 		{
 			// Case for rebound left
-			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 2, bottom_left_tile.col - 1))
+			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWallClone(bottom_left_tile.row - 2, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound right
-			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row - 2, bottom_left_tile.col + 2))
+			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWallClone(bottom_left_tile.row - 2, bottom_left_tile.col + 2))
 				return true;
 		}
 	}
@@ -343,16 +503,16 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ tile)
 	if (origin_tile.row != width)
 	{
 		if (abs(origin_tile.col - tile.col) == 1 && origin_tile.row + 1 == tile.row &&                 // Target is of this case
-			!g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col) &&                       // No first wall
-			(tile.row == width || g_terrain.IsWall(bottom_left_tile.row + 5, bottom_left_tile.col)) && // Yes second wall
+			!g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col) &&                       // No first wall
+			(tile.row == width || g_terrain.IsWallClone(bottom_left_tile.row + 5, bottom_left_tile.col)) && // Yes second wall
 			!g_terrain.IsBlank(bottom_left_tile.row + 3, bottom_left_tile.col))                        // There's a player to skip over
 
 		{
 			// Case for rebound left
-			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 3, bottom_left_tile.col - 1))
+			if (origin_tile.col != 0 && origin_tile.col - 1 == tile.col && !g_terrain.IsWallClone(bottom_left_tile.row + 3, bottom_left_tile.col - 1))
 				return true;
 			// Case for rebound right
-			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWall(bottom_left_tile.row + 3, bottom_left_tile.col + 2))
+			if (origin_tile.col != width && origin_tile.col + 1 == tile.col && !g_terrain.IsWallClone(bottom_left_tile.row + 3, bottom_left_tile.col + 2))
 				return true;
 		}
 	}
@@ -380,9 +540,9 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 		if (tile.col != width)
 		{
 			// If there's room for the wall
-			if (!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col) &&
-				!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col + 2) &&
-				!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col + 3))
+			if (!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 2) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col + 3))
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
@@ -392,9 +552,9 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 		// If in the end of the board
 		else
 		{
-			if (!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col) &&
-				!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col - 1) &&
-				!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col - 2))
+			if (!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 1) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col - 2))
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
@@ -409,9 +569,9 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 		if (tile.row != width)
 		{
 			// If there's room for the wall
-			if (!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col) &&
-				!g_terrain.IsWall(bottom_left_tile.row + 2, bottom_left_tile.col) &&
-				!g_terrain.IsWall(bottom_left_tile.row + 3, bottom_left_tile.col))
+			if (!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row + 2, bottom_left_tile.col) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row + 3, bottom_left_tile.col))
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
@@ -421,9 +581,9 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 		// If in the end of the board
 		else
 		{
-			if (!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col) &&
-				!g_terrain.IsWall(bottom_left_tile.row - 1, bottom_left_tile.col) &&
-				!g_terrain.IsWall(bottom_left_tile.row - 2, bottom_left_tile.col))
+			if (!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row - 1, bottom_left_tile.col) &&
+				!g_terrain.IsWallClone(bottom_left_tile.row - 2, bottom_left_tile.col))
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
