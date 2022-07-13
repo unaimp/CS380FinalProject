@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(100),
+		mMaximumIterations(1000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -69,8 +69,11 @@ namespace MonteCarlo {
 		double higherValue = -10000.;
 		Node* betterOption = nullptr;
 
+		std::cout << std::endl << std::endl;
 		//Pick the better move
 		for (auto& it : mRoot->mChildren) {
+			//print out data
+			std::cout << "Moving to:" << it->mState->mRow << ", " << it->mState->mColumn << " has value of: " << it->mTotalSimulationReward << std::endl;
 			if (it->mTotalSimulationReward > higherValue) {
 				higherValue = it->mTotalSimulationReward;
 				betterOption = it;
@@ -289,7 +292,7 @@ namespace MonteCarlo {
 			new Node(this, fwd, false);
 
 		//wall placement
-		new Node(this, TileQ(this->mState->mRow, this->mState->mColumn), true);
+		//new Node(this, TileQ(this->mState->mRow, this->mState->mColumn), true);
 
 		if (q->IsLegalMove(TileQ(mState->mRow, mState->mColumn), right))
 			new Node(this, right, false);
