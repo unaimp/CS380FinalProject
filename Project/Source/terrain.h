@@ -77,7 +77,7 @@ public:
 	void MousClick(bool click) { m_mouse_click = click; }
 	bool IsMousClick() { return m_mouse_click; }
 
-	bool IsBlank(int r, int c) { return m_terrainColor[r][c] == DEBUG_COLOR_WHITE; }
+	bool IsBlank(int r, int c) { return m_map_clone.GetColor(r,c) == DEBUG_COLOR_WHITE; }
 	
 	bool IsPlayerTurn() { return m_player_turn; }
 	void ChangeTurn() { m_player_turn = !m_player_turn; }
@@ -88,6 +88,7 @@ public:
 	void CloneMap();
 	bool IsWallClone(int r, int c);
 	Map& GetCloneMap() { return m_map_clone; }
+	void SetCloneColor(int r, int c, DebugDrawingColor t) { m_map_clone.SetColor(r,c,t); }
 
 protected:
 
