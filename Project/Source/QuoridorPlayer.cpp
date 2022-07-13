@@ -897,6 +897,46 @@ bool QuoridorPlayer::WallCheck(int or , int oc, int r, int c)
 	return false;
 }
 
+bool QuoridorPlayer::WallCheck2(int or , int oc, int r, int c)
+{
+	// If it's a wall already, return true
+	if (g_terrain.IsWall(or , oc))
+		return true;
+	// If it's a diagonal
+	if (IsDiagonal(or , oc, r, c))
+	{
+		// If the diagonal is on the right top
+		if (or < r && oc < c)
+		{
+			// If the right from the parent also a wall, can't make that diagonal
+			if (g_terrain.IsWallClone(or +1, oc) && g_terrain.IsWallClone(or , oc + 1))
+				return true;
+		}
+		// If the diagonal is on the left top
+		if (or > r && oc < c)
+		{
+			// If the left from the parent also a wall, can't make that diagonal
+			if (g_terrain.IsWallClone(or -1, oc) && g_terrain.IsWallClone(or , oc + 1))
+				return true;
+		}
+		// If the diagonal is on the right down
+		if (or < r && oc > c)
+		{
+			// If the right from the parent also a wall, can't make that diagonal
+			if (g_terrain.IsWallClone(or +1, oc) && g_terrain.IsWallClone(or , oc - 1))
+				return true;
+		}
+		// If the diagonal is on the left down
+		if (or > r && oc > c)
+		{
+			// If the left from the parent also a wall, can't make that diagonal
+			if (g_terrain.IsWallClone(or -1, oc) && g_terrain.IsWallClone(or , oc - 1))
+				return true;
+		}
+	}
+	return false;
+}
+
 bool QuoridorPlayer::PathCheck(int r0, int c0, int r, int c)
 {
 

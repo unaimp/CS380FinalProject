@@ -157,3 +157,17 @@ void Map::UpdateMaps(int r, int c, Tile tile, DebugDrawingColor color, float inf
 	m_terrainColor[r][c] = color;
 	m_terrainInfluenceMap[r][c] = influence;
 }
+
+void Map::SetCentralInfluence(int r, int c)
+{
+	for (int row = 0; row < m_width; row++)
+	{
+		for (int col = 0; col < m_width; col++)
+			m_terrainInfluenceMap[r][c] = 0.f;
+	}
+
+	m_terrainInfluenceMap[r + 0][c + 0] = 1.f;
+	m_terrainInfluenceMap[r + 0][c + 1] = 1.f;
+	m_terrainInfluenceMap[r + 1][c + 0] = 1.f;
+	m_terrainInfluenceMap[r + 1][c + 1] = 1.f;
+}

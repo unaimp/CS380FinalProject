@@ -1,5 +1,6 @@
 #include <vector>
 
+class TileQ;
 
 namespace MonteCarlo {
 	struct Simulator; //fwd declaration
@@ -37,6 +38,7 @@ namespace MonteCarlo {
 		bool Simulation(Node* node);
 		void BackPropagation(Node*, bool aiWon);
 		void ActualMove();
+		TileQ Propagation(TileQ origin, float decay, float growing);
 
 		QuoridorPlayer* mAIPlayer;
 		QuoridorPlayer* mHumanPlayer;

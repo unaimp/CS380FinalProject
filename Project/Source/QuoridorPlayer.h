@@ -63,6 +63,7 @@ public:
 	bool IsDiagonal(int or , int oc, int r, int c);
 	void AFillWaypoint(int r, int c);
 	bool WallCheck(int or , int oc, int r, int c);
+	bool WallCheck2(int or , int oc, int r, int c);
 
 	TileQ m_tile;
 private:

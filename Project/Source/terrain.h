@@ -89,6 +89,9 @@ public:
 	bool IsWallClone(int r, int c);
 	Map& GetCloneMap() { return m_map_clone; }
 	void SetCloneColor(int r, int c, DebugDrawingColor t) { m_map_clone.SetColor(r,c,t); }
+	void SetInfluenceCloneMapValue(int r, int c, float value) { m_map_clone.SetInfluence[r][c] = value; }
+
+	float Lerp(float num1, float num2, float t);
 
 protected:
 
@@ -124,5 +127,4 @@ protected:
 
 	float ClosestWall(int row, int col);
 	bool LineIntersect(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4);
-	float Lerp(float num1, float num2, float t);
 };
