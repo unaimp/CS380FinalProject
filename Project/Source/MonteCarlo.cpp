@@ -224,10 +224,10 @@ namespace MonteCarlo {
 				}
 				AIState = RollOut(AIState, AI, true);
 				//set new position on clone map
-				//if(mAIRow >= 0)
-				//	AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
+				if(mAIRow >= 0)
+					AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
 				mAIRow = AIState.mRow;		mAIColumn = AIState.mColumn;
-				//AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
+				AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
 			}
 
 			//player simulation turn
@@ -236,10 +236,10 @@ namespace MonteCarlo {
 			}
 			playerState = RollOut(playerState, player, false);
 			//set new position on clone map
-			//if (mPlayerRow >= 0)
-			//	AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
+			if (mPlayerRow >= 0)
+				AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
 			mPlayerRow = playerState.mRow;		mPlayerColumn = playerState.mColumn;
-			//AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
+			AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
 		}
 	}
 
