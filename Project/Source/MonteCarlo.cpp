@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(1000),
+		mMaximumIterations(100),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -34,6 +34,9 @@ namespace MonteCarlo {
 		mRoot = new Node();
 		mRoot->mVisitedTimes = 1; //not to simulate from here, first create possible children
 		mRoot->mState = new State(TileQ(mHumanPlayer->GetTile().row, mHumanPlayer->GetTile().col), false, false);
+
+		//clone current map
+		g_terrain.CloneMap();
 	}
 
 	void MonteCarloTree::End(void) {
@@ -62,7 +65,7 @@ namespace MonteCarlo {
 			//Principle of operations
 			Node* leafNode = Selection(mRoot);
 			Node* expandedNode = Expansion(leafNode);
-			double simulationValue = Simulation(expandedNode);
+			bool simulationValue = Simulation(expandedNode);
 			BackPropagation(expandedNode, simulationValue);
 		}
 
@@ -92,7 +95,7 @@ namespace MonteCarlo {
 
 		//actually move the AI player on the board
 		//erase color from previous one
-		mAIPlayer->SetTile(TileQ(mRoot->mState->mRow, mRoot->mState->mColumn), false);
+		mAIPlayer->SetTile(mAIPlayer->GetTile(), false);
 		//set new tile position
 		mAIPlayer->m_tile = TileQ(betterOption->mState->mRow, betterOption->mState->mColumn);
 		
@@ -161,7 +164,7 @@ namespace MonteCarlo {
 
 	/* Complete one random playout from node C
 	A playout may be as simple as choosing uniform random moves until the game is decided */
-	double MonteCarloTree::Simulation(Node* node) {
+	bool MonteCarloTree::Simulation(Node* node) {
 		//get player and AI position for simulating
 		TileQ playerTile, aiTile;
 		//depending on which's  turn it is, the current node will be whose turn is, 
@@ -182,61 +185,62 @@ namespace MonteCarlo {
 				aiTile = mAIPlayer->GetTile();
 		}
 
-		double simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, node->mAI);
+		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, node->mAI);
 
 		//stats
-		if (simValue < 0)
-			mPlayerWinTimes++;
-		else
+		if (simValue)
 			mAIWinTimes++;
+		else
+			mPlayerWinTimes++;
 
 		return simValue;
 	}
 
 	/*Use the result of the playout to update information in the nodes on the path from C to R.*/
-	void MonteCarloTree::BackPropagation(Node* node, double simValue) {
+	void MonteCarloTree::BackPropagation(Node* node, bool aiWon) {
 		if (node == nullptr)		return; //root node
 
 		//update values
-		node->mTotalSimulationReward += simValue;
+		if(aiWon)
+			node->mTotalSimulationReward ++;
+
 		node->mVisitedTimes++;
 
-		BackPropagation(node->mParent, simValue);
+		BackPropagation(node->mParent, aiWon);
 	}
 
 
-	double Simulator::Simulate(TileQ& AITile, TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts) {
-		int numberOfActions = 0;
+	bool Simulator::Simulate(TileQ& AITile, TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts) {
 		State AIState = State(AITile, true, false);
 		State playerState = State(playerTile, false, false);
 
-		double AIWIN = 0;
 		//During simulation the moves are chosen with respect to a function called rollout policy function (which has some biased stats)
 		while (1) {
-			numberOfActions++;
-
 			if (AIStarts) {
 				AIStarts = true;
 				//AI simulation turn
 				if (AIState.IsTerminal()) {
-					AIWIN = 1.;
-					break;
+					return true; //AI WIN
 				}
 				AIState = RollOut(AIState, AI, true);
+				//set new position on clone map
+				//if(mAIRow >= 0)
+				//	AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
 				mAIRow = AIState.mRow;		mAIColumn = AIState.mColumn;
+				//AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
 			}
 
 			//player simulation turn
 			if (playerState.IsTerminal()) {
-				AIWIN = -1.;
-				break;
+				return false; //Human WIN
 			}
 			playerState = RollOut(playerState, player, false);
+			//set new position on clone map
+			//if (mPlayerRow >= 0)
+			//	AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
 			mPlayerRow = playerState.mRow;		mPlayerColumn = playerState.mColumn;
+			//AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
 		}
-
-		//set the value of the simulation
-		return AIWIN / numberOfActions;
 	}
 
 	State& Simulator::RollOut(const State currentState, QuoridorPlayer* q,  bool AITurn, std::vector<Moves>& posibleMoves) {
@@ -248,9 +252,9 @@ namespace MonteCarlo {
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_PLACE_WALL);
-			posibleMoves.push_back(Moves::M_PLACE_WALL);
-			posibleMoves.push_back(Moves::M_PLACE_WALL);
+			//posibleMoves.push_back(Moves::M_PLACE_WALL);
+			//posibleMoves.push_back(Moves::M_PLACE_WALL);
+			//posibleMoves.push_back(Moves::M_PLACE_WALL);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_LEFT);

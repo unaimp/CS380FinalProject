@@ -20,7 +20,7 @@ namespace MonteCarlo {
 			bool mAI;
 			//data
 			unsigned int mVisitedTimes;
-			double mTotalSimulationReward;
+			float mTotalSimulationReward;
 		};
 		MonteCarloTree(void);
 		~MonteCarloTree(void);
@@ -34,8 +34,8 @@ namespace MonteCarlo {
 		//Principle of operation
 		Node* Selection(Node* currentNode);
 		Node* Expansion(Node* leafNode);
-		double Simulation(Node* node);
-		void BackPropagation(Node*, double simValue);
+		bool Simulation(Node* node);
+		void BackPropagation(Node*, bool aiWon);
 		void ActualMove();
 
 		QuoridorPlayer* mAIPlayer;
@@ -58,7 +58,7 @@ namespace MonteCarlo {
 
 
 	struct Simulator {
-		double Simulate(TileQ& AITile, TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
+		bool Simulate(TileQ& AITile, TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
 		State& RollOut(const State currentState, QuoridorPlayer* q, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
 
 	private:
