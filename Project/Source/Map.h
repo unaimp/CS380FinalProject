@@ -68,6 +68,8 @@ public:
 
 	void UpdateMaps(int r, int c, Tile tile, DebugDrawingColor color, float influence);
 	Tile GetTile(int r, int c) { return m_terrain[r][c]; }
+	void SetColor(int r, int c, DebugDrawingColor color) { m_terrainColor[r][c] = color; }
+	DebugDrawingColor GetColor(int r, int c) { return m_terrainColor[r][c]; }
 
 	void PlaceWall(int row, int col);
 	void RemoveWall(int &row, int &col);

@@ -31,6 +31,7 @@ public:
 	bool IsLegalWall(TileQ origin_tile, TileQ tile);
 
 	bool IsLegalWallAfterPathfinding(TileQ origin_tile, TileQ tile);
+	void SetTileClone(TileQ tile, bool ontile);
 	void SetWallClone(TileQ tile);
 
 	TileQ GetTile() { return m_tile; }
