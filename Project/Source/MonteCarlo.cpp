@@ -418,7 +418,7 @@ namespace MonteCarlo {
 								wall_tile = quoridor_tile;
 								continue;
 							}
-							else if (row != 0)
+							else if (quoridor_tile.row != 0)
 							{
 								quoridor_tile.row--;
 								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
@@ -438,7 +438,7 @@ namespace MonteCarlo {
 								wall_tile = quoridor_tile;
 								continue;
 							}
-							else if (col != 0)
+							else if (quoridor_tile.col != 0)
 							{
 								quoridor_tile.col--;
 								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
