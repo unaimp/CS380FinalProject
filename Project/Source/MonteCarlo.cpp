@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(3000),
+		mMaximumIterations(100),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -34,9 +34,6 @@ namespace MonteCarlo {
 		mRoot = new Node();
 		mRoot->mVisitedTimes = 1; //not to simulate from here, first create possible children
 		mRoot->mState = new State(TileQ(mHumanPlayer->GetTile().row, mHumanPlayer->GetTile().col), false, false);
-
-		//clone current map
-		g_terrain.CloneMap();
 	}
 
 	void MonteCarloTree::End(void) {
@@ -60,6 +57,9 @@ namespace MonteCarlo {
 		srand(time(nullptr));
 
 		while (mCurrentIterations < mMaximumIterations) {
+			//clone actual map
+			g_terrain.CloneMap();
+
 			mCurrentIterations++;
 
 			//Principle of operations
@@ -73,7 +73,7 @@ namespace MonteCarlo {
 	}
 
 	void MonteCarloTree::ActualMove() {
-		double higherValue = -10000.;
+		int higherValue = -10000;
 		Node* betterOption = nullptr;
 
 		std::cout << std::endl << std::endl;
@@ -81,16 +81,36 @@ namespace MonteCarlo {
 		mStats.clear();
 		std::stringstream ss;
 
+		const TileQ& currentTile = mAIPlayer->GetTile();
 		//Pick the better move
 		for (auto& it : mRoot->mChildren) {
 			//print out data
-			ss << "Moving to: " << it->mState->mRow << ", " << it->mState->mColumn << " has value of: " << it->mTotalSimulationReward << std::endl;
+			if(it->mState->mWallPlacement)
+				ss << "Placing a wall in:  " << it->mState->mTile.row << ", " << it->mState->mTile.col << "has a value of: " << it->mTotalSimulationReward << std::endl;
+			else
+				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward << std::endl;
+
 			if (it->mTotalSimulationReward > higherValue) {
 				higherValue = it->mTotalSimulationReward;
 				betterOption = it;
 			}
 		}
-		ss << std::endl<< "AI moving to: " << betterOption->mState->mRow << ", " << betterOption->mState->mColumn << std::endl;
+
+
+		//print out data
+		if (betterOption->mState->mWallPlacement) {
+			ss << "Placing a wall in: "<< betterOption->mState->mTile.row << ", " << betterOption->mState->mTile.col  <<  std::endl;
+			mAIPlayer->SetWall(betterOption->mState->mTile);
+			mAIPlayer->m_walls--;
+		}
+		else {
+			ss << std::endl << "AI moving to: " << betterOption->mState->mTile.row << ", " << betterOption->mState->mTile.col << std::endl;
+			//actually move the AI player on the board
+			//erase color from previous one
+			mAIPlayer->SetTile(mAIPlayer->GetTile(), false);
+			//set new tile position
+			mAIPlayer->m_tile = betterOption->mState->mTile;
+		}
 
 		ss << "Simulation stats:" << std::endl;
 
@@ -99,11 +119,6 @@ namespace MonteCarlo {
 
 		mStats = ss.str();
 
-		//actually move the AI player on the board
-		//erase color from previous one
-		mAIPlayer->SetTile(mAIPlayer->GetTile(), false);
-		//set new tile position
-		mAIPlayer->m_tile = TileQ(betterOption->mState->mRow, betterOption->mState->mColumn);
 		
 		//erase the created tree
 		End();
@@ -177,19 +192,34 @@ namespace MonteCarlo {
 		// and the parent of this node will be the others
 		//if no parent it will be current board position
 		if (node->mAI) {
-			aiTile = TileQ(node->mState->mRow, node->mState->mColumn);
+			aiTile = node->mState->mTile;
 			if (node->mParent)
-				playerTile = TileQ(node->mParent->mState->mRow, node->mParent->mState->mColumn);
+				playerTile = node->mParent->mState->mTile;
 			else
 				playerTile = mHumanPlayer->GetTile();
 		}
 		else {
-			playerTile = TileQ(node->mState->mRow, node->mState->mColumn);
-			if (node->mParent)
-				aiTile = TileQ(node->mParent->mState->mRow, node->mParent->mState->mColumn);
+			playerTile = node->mState->mTile;
+				if (node->mParent)
+					aiTile = node->mParent->mState->mTile;
 			else
 				aiTile = mAIPlayer->GetTile();
 		}
+
+		//place the wall if this move does that
+		if (node->mState->mWallPlacement) {
+			if (node->mAI) {
+				TileQ wall = mSimulator->PlaceWall(playerTile, true);
+				mAIPlayer->SetWallClone(wall);
+				node->mState->mTile = wall;
+			}
+			else {
+				TileQ wall = mSimulator->PlaceWall(aiTile, false);
+				mHumanPlayer->SetWallClone(wall);
+				node->mState->mTile = wall;
+			}
+		}
+
 
 		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, node->mAI);
 
@@ -216,7 +246,7 @@ namespace MonteCarlo {
 	}
 
 
-	bool Simulator::Simulate(TileQ& AITile, TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts) {
+	bool Simulator::Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts) {
 		State AIState = State(AITile, true, false);
 		State playerState = State(playerTile, false, false);
 
@@ -228,11 +258,11 @@ namespace MonteCarlo {
 				if (AIState.IsTerminal()) {
 					return true; //AI WIN
 				}
-				AIState = RollOut(AIState, AI, true);
+				AIState = RollOut(AIState, AI, player, true);
 				//set new position on clone map
 				if(mAIRow >= 0)
 					AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
-				mAIRow = AIState.mRow;		mAIColumn = AIState.mColumn;
+				mAIRow = AIState.mTile.row;		mAIColumn = AIState.mTile.col;
 				AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
 			}
 
@@ -240,16 +270,17 @@ namespace MonteCarlo {
 			if (playerState.IsTerminal()) {
 				return false; //Human WIN
 			}
-			playerState = RollOut(playerState, player, false);
+			playerState = RollOut(playerState, player, AI, false);
 			//set new position on clone map
 			if (mPlayerRow >= 0)
 				AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
-			mPlayerRow = playerState.mRow;		mPlayerColumn = playerState.mColumn;
+			mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
 			AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
 		}
 	}
 
-	State& Simulator::RollOut(const State currentState, QuoridorPlayer* q,  bool AITurn, std::vector<Moves>& posibleMoves) {
+	State& Simulator::RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, 
+		bool AITurn, std::vector<Moves>& posibleMoves) {
 		//moves are not created yet
 		if (posibleMoves.empty()) {
 			//BIASED ACTIONS
@@ -258,9 +289,11 @@ namespace MonteCarlo {
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_PLACE_WALL);
-			posibleMoves.push_back(Moves::M_PLACE_WALL);
-			posibleMoves.push_back(Moves::M_PLACE_WALL);
+			if (movingQuoridor->GetWalls() > 0) {
+				posibleMoves.push_back(Moves::M_PLACE_WALL);
+				posibleMoves.push_back(Moves::M_PLACE_WALL);
+				posibleMoves.push_back(Moves::M_PLACE_WALL);
+			}
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_LEFT);
@@ -277,30 +310,30 @@ namespace MonteCarlo {
 		switch (posibleMoves[randomNumber]) {
 		case Moves::M_MOVE_FWD:
 			if (AITurn)
-				destinationTile = TileQ(currentState.mRow - 1, currentState.mColumn);
+				destinationTile = TileQ(currentState.mTile.row - 1, currentState.mTile.col);
 			else
-				destinationTile = TileQ(currentState.mRow + 1, currentState.mColumn);
+				destinationTile = TileQ(currentState.mTile.row + 1, currentState.mTile.col);
 			break;
 		case Moves::M_MOVE_RIGHT:
-			destinationTile = TileQ(currentState.mRow, currentState.mColumn + 1);
+			destinationTile = TileQ(currentState.mTile.row, currentState.mTile.col + 1);
 			break;
 		case Moves::M_MOVE_LEFT:
-			destinationTile = TileQ(currentState.mRow, currentState.mColumn - 1);
+			destinationTile = TileQ(currentState.mTile.row, currentState.mTile.col - 1);
 			break;
 		case Moves::M_MOVE_BACKWD:
 			if (AITurn)
-				destinationTile = TileQ(currentState.mRow + 1, currentState.mColumn);
+				destinationTile = TileQ(currentState.mTile.row + 1, currentState.mTile.col);
 			else
-				destinationTile = TileQ(currentState.mRow - 1, currentState.mColumn);
+				destinationTile = TileQ(currentState.mTile.row - 1, currentState.mTile.col);
 
 			break;
 		case Moves::M_PLACE_WALL:
-			TileQ otherPlayerTile = AITurn ? TileQ(mPlayerRow, mPlayerColumn) : TileQ(mAIRow, mAIColumn);
-			q->SetWallClone(PlaceWall(TileQ(otherPlayerTile), AITurn));
-			return State(TileQ(currentState.mRow, currentState.mColumn), AITurn, true);
+			TileQ otherPlayerTile = otherPlayer->GetTile();
+			movingQuoridor->SetWallClone(PlaceWall(otherPlayerTile, AITurn));
+			return State(currentState.mTile, AITurn, true);
 		}
 
-		if (q->IsLegalMove(TileQ(currentState.mRow, currentState.mColumn), destinationTile)) {
+		if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
 			return State(destinationTile, AITurn, false);
 		}
 		else {
@@ -314,7 +347,7 @@ namespace MonteCarlo {
 					it++;
 				}
 			}
-			return RollOut(currentState, q, AITurn, posibleMoves);
+			return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
 		}
 	}
 
@@ -483,25 +516,26 @@ namespace MonteCarlo {
 		State previousState = grandParent ? *grandParent->mState 
 			: State(q->GetTile(), !this->mAI, false);
 
-		TileQ up(previousState.mRow + 1, previousState.mColumn);
-		TileQ right(previousState.mRow, previousState.mColumn + 1);
-		TileQ left(previousState.mRow, previousState.mColumn - 1);
-		TileQ down(previousState.mRow - 1, previousState.mColumn);
+		TileQ up(previousState.mTile.row + 1, previousState.mTile.col);
+		TileQ right(previousState.mTile.row, previousState.mTile.col + 1);
+		TileQ left(previousState.mTile.row, previousState.mTile.col - 1);
+		TileQ down(previousState.mTile.row - 1, previousState.mTile.col);
 
 		//create all possible moves
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), up))
+		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), up))
 			new Node(this, up, false, previousState.mAI);
 
 		//wall placement
-		new Node(this, TileQ(previousState.mRow, previousState.mColumn), true, previousState.mAI);
+		if(q->GetWalls() > 0)
+			new Node(this, TileQ(previousState.mTile.row, previousState.mTile.col), true, previousState.mAI);
 
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), right))
+		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), right))
 			new Node(this, right, false, previousState.mAI);
 		//
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), left))
+		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), left))
 			new Node(this, left, false, previousState.mAI);
 		//
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), down))
+		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), down))
 			new Node(this, down, false, previousState.mAI);
 	}
 }

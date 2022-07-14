@@ -36,7 +36,6 @@ public:
 
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }
-	unsigned GetStairs() { return m_stairs; }
 
 	// Pathfinding stuff
 	struct a_node_data
@@ -66,10 +65,9 @@ public:
 	bool WallCheck2(int or , int oc, int r, int c);
 
 	TileQ m_tile;
+	unsigned m_walls;
 private:
 	bool m_type;
-	unsigned m_walls;
-	unsigned m_stairs;
 
 	// Pathfinding variables
 	int m_width;

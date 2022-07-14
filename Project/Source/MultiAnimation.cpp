@@ -845,8 +845,6 @@ void RenderText()
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	txtHelper.SetInsertionPos(5, y += 10);
 	txtHelper.DrawFormattedTextLine(L"Player Walls:             %d", player.GetWalls());
-	txtHelper.SetInsertionPos(5, y += 10);
-	txtHelper.DrawFormattedTextLine(L"Player Stairs:            %d", player.GetStairs());
 
 	// Print out Player Order case
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
@@ -869,8 +867,6 @@ void RenderText()
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	txtHelper.SetInsertionPos(5, y += 10);
 	txtHelper.DrawFormattedTextLine(L"NPC Walls:                %d", npc.GetWalls());
-	txtHelper.SetInsertionPos(5, y += 10);
-	txtHelper.DrawFormattedTextLine(L"NPC Stairs:               %d", npc.GetStairs());
 
 	std::string ai_stats = g_database.mAILogic->GetStats();
 	std::wstring widestr = std::wstring(ai_stats.begin(), ai_stats.end());
