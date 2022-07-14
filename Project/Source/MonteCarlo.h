@@ -30,6 +30,8 @@ namespace MonteCarlo {
 		void Execute(void);
 		void End(void);
 
+		std::string GetStats() { return mStats; }
+
 	private:
 		void Eraser(Node* n);
 		//Principle of operation
@@ -55,6 +57,8 @@ namespace MonteCarlo {
 
 		int mAIWinTimes;
 		int mPlayerWinTimes;
+
+		std::string mStats;
 	};
 
 

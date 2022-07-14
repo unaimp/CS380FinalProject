@@ -77,21 +77,27 @@ namespace MonteCarlo {
 		Node* betterOption = nullptr;
 
 		std::cout << std::endl << std::endl;
+
+		mStats.clear();
+		std::stringstream ss;
+
 		//Pick the better move
 		for (auto& it : mRoot->mChildren) {
 			//print out data
-			std::cout << "Moving to:" << it->mState->mRow << ", " << it->mState->mColumn << " has value of: " << it->mTotalSimulationReward << std::endl;
+			ss << "Moving to: " << it->mState->mRow << ", " << it->mState->mColumn << " has value of: " << it->mTotalSimulationReward << std::endl;
 			if (it->mTotalSimulationReward > higherValue) {
 				higherValue = it->mTotalSimulationReward;
 				betterOption = it;
 			}
 		}
-		std::cout << std::endl<< "AI moving to: " << betterOption->mState->mRow << ", " << betterOption->mState->mColumn << std::endl;
+		ss << std::endl<< "AI moving to: " << betterOption->mState->mRow << ", " << betterOption->mState->mColumn << std::endl;
 
-		std::cout << "Simulation stats:" << std::endl;
+		ss << "Simulation stats:" << std::endl;
 
-		std::cout << "Player win rate = " << static_cast<float>(mPlayerWinTimes) / mMaximumIterations << std::endl;
-		std::cout << "AI     win rate = " << static_cast<float>(mAIWinTimes) / mMaximumIterations << std::endl;
+		ss << "Player win rate = " << (static_cast<float>(mPlayerWinTimes) / mMaximumIterations) * 100.f << "%" << std::endl;
+		ss << "AI     win rate = " << (static_cast<float>(mAIWinTimes) / mMaximumIterations) * 100.f << "%" << std::endl;
+
+		mStats = ss.str();
 
 		//actually move the AI player on the board
 		//erase color from previous one

@@ -872,6 +872,15 @@ void RenderText()
 	txtHelper.SetInsertionPos(5, y += 10);
 	txtHelper.DrawFormattedTextLine(L"NPC Stairs:               %d", npc.GetStairs());
 
+	std::string ai_stats = g_database.mAILogic->GetStats();
+	std::wstring widestr = std::wstring(ai_stats.begin(), ai_stats.end());
+	const WCHAR* ai = widestr.c_str();
+
+	// Print out AI stats
+	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	txtHelper.SetInsertionPos(5, y += 20);
+	txtHelper.DrawTextLine(ai);
+
 	/*// Print out Heuristic Weight
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	txtHelper.SetInsertionPos(5, y += 10);
