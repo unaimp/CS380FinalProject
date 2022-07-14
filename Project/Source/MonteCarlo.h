@@ -40,7 +40,6 @@ namespace MonteCarlo {
 		bool Simulation(Node* node);
 		void BackPropagation(Node*, bool aiWon);
 		void ActualMove();
-		TileQ Propagation(TileQ origin, float decay, float growing);
 
 		QuoridorPlayer* mAIPlayer;
 		QuoridorPlayer* mHumanPlayer;
@@ -72,5 +71,7 @@ namespace MonteCarlo {
 		int mAIRow, mAIColumn;
 
 		void PlaceWall() {};
+
+		TileQ Propagation(TileQ origin, bool propagation_up, float decay, float growing);
 	};
 }

@@ -364,11 +364,16 @@ namespace MonteCarlo {
 			new Node(this, down, false, previousState.mAI);
 	}
 
-	TileQ MonteCarloTree::Propagation(TileQ origin, float decay, float growing)
+	TileQ Simulator::Propagation(TileQ origin, bool propagation_up, float decay, float growing)
 	{
 		int width = g_terrain.GetWidth();
 
 		g_terrain.GetCloneMap().SetCentralInfluence(origin.row, origin.col);
+
+		QuoridorPlayer quoridor(g_database.Find("NPC")->GetQuoridor());
+		
+		if (!propagation_up)
+			quoridor = g_database.Find("Player")->GetQuoridor();
 	
 		std::vector<float> m_terrainTempMap; // row * with + col
 		m_terrainTempMap.resize(width * width);
@@ -376,6 +381,18 @@ namespace MonteCarlo {
 		// Iterate through all tiles
 		for (int row = 0; row < width; row++)
 		{
+			int rmin, rmax;
+			if (propagation_up)
+			{
+				rmin = row;
+				rmax = min(row + 1, width - 1);
+			}
+			else
+			{
+				rmin = max(row - 1, 0);
+				rmax = row;
+			}
+
 			for (int col = 0; col < width; col++)
 			{
 				float N = 0.f;
@@ -385,12 +402,12 @@ namespace MonteCarlo {
 					continue;
 				}
 				// Checking the neighbours
-				for (int r = row; r <= min(row + 1, width - 1); r++)
+				for (int r = rmin; r <= rmax; r++)
 				{
 					for (int c = max(col - 1, 0); c <= min(col + 1, width - 1); c++)
 					{
 						// Wall in the way, skip
-						if (mAIPlayer->WallCheck2(row, col, r, c))
+						if (quoridor.WallCheck2(row, col, r, c))
 							break;
 						// If center skip
 						if (r == row && c == col)
@@ -440,7 +457,7 @@ namespace MonteCarlo {
 						if (row % 3 == 2)
 						{
 							quoridor_tile.half_row = true;
-							if (mAIPlayer->IsLegalWall(mAIPlayer->GetTile(), quoridor_tile))
+							if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
 							{
 								max_influence = influence;
 								wall_tile = quoridor_tile;
@@ -449,7 +466,7 @@ namespace MonteCarlo {
 							else if (row != 0)
 							{
 								quoridor_tile.row--;
-								if (mAIPlayer->IsLegalWall(mAIPlayer->GetTile(), quoridor_tile))
+								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
 								{
 									max_influence = influence;
 									wall_tile = quoridor_tile;
@@ -460,7 +477,7 @@ namespace MonteCarlo {
 						if (col % 3 == 2)
 						{
 							quoridor_tile.half_col = true;
-							if (mAIPlayer->IsLegalWall(mAIPlayer->GetTile(), quoridor_tile))
+							if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
 							{
 								max_influence = influence;
 								wall_tile = quoridor_tile;
@@ -469,7 +486,7 @@ namespace MonteCarlo {
 							else if (col != 0)
 							{
 								quoridor_tile.col--;
-								if (mAIPlayer->IsLegalWall(mAIPlayer->GetTile(), quoridor_tile))
+								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
 								{
 									max_influence = influence;
 									wall_tile = quoridor_tile;
