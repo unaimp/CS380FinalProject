@@ -258,16 +258,15 @@ namespace MonteCarlo {
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			//posibleMoves.push_back(Moves::M_PLACE_WALL);
-			//posibleMoves.push_back(Moves::M_PLACE_WALL);
-			//posibleMoves.push_back(Moves::M_PLACE_WALL);
+			posibleMoves.push_back(Moves::M_PLACE_WALL);
+			posibleMoves.push_back(Moves::M_PLACE_WALL);
+			posibleMoves.push_back(Moves::M_PLACE_WALL);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_LEFT);
 			posibleMoves.push_back(Moves::M_MOVE_LEFT);
 			posibleMoves.push_back(Moves::M_MOVE_BACKWD);
 		}
-
 
 		//randomizer for next move
 		int randomNumber = rand() % posibleMoves.size();
@@ -296,7 +295,8 @@ namespace MonteCarlo {
 
 			break;
 		case Moves::M_PLACE_WALL:
-			PlaceWall();
+			TileQ otherPlayerTile = AITurn ? TileQ(mPlayerRow, mPlayerColumn) : TileQ(mAIRow, mAIColumn);
+			q->SetWallClone(PlaceWall(TileQ(otherPlayerTile), AITurn));
 			return State(TileQ(currentState.mRow, currentState.mColumn), AITurn, true);
 		}
 
@@ -318,66 +318,21 @@ namespace MonteCarlo {
 		}
 	}
 
-	MonteCarloTree::Node::Node() : mParent(nullptr), mState(nullptr), mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(false) {
-
-	}
-
-	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI) : mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(AI),
-	mState(new State(tile, mAI, wallPlacement)){
-		//add parent as parent pointer
-		mParent = parent;
-
-		//add this node to the children vector of parent
-		parent->mChildren.push_back(this);
-	}
-
-	MonteCarloTree::Node::~Node() {
-		delete mState;
-	}
-
-	void MonteCarloTree::Node::CreateChildren(QuoridorPlayer* q) {
-		//get grandparent node (the previous move for the plyaer)
-		Node* grandParent = this->mParent ? this->mParent : nullptr;
-		//if not grandparent get current board position state
-		State previousState = grandParent ? *grandParent->mState 
-			: State(q->GetTile(), !this->mAI, false);
-
-		TileQ up(previousState.mRow + 1, previousState.mColumn);
-		TileQ right(previousState.mRow, previousState.mColumn + 1);
-		TileQ left(previousState.mRow, previousState.mColumn - 1);
-		TileQ down(previousState.mRow - 1, previousState.mColumn);
-
-		//create all possible moves
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), up))
-			new Node(this, up, false, previousState.mAI);
-
-		//wall placement
-		//new Node(this, TileQ(this->mState->mRow, this->mState->mColumn), true, , !this->mAI);
-
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), right))
-			new Node(this, right, false, previousState.mAI);
-		//
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), left))
-			new Node(this, left, false, previousState.mAI);
-		//
-		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), down))
-			new Node(this, down, false, previousState.mAI);
-	}
-
-	TileQ Simulator::Propagation(TileQ origin, bool propagation_up, float decay, float growing)
+	//Places a wall using propagation logic
+	const TileQ& Simulator::PlaceWall(const TileQ& origin, bool propagation_up, float decay, float growing)
 	{
 		int width = g_terrain.GetWidth();
 
 		g_terrain.GetCloneMap().SetCentralInfluence(origin.row, origin.col);
 
 		QuoridorPlayer quoridor(g_database.Find("NPC")->GetQuoridor());
-		
+
 		if (!propagation_up)
 			quoridor = g_database.Find("Player")->GetQuoridor();
-	
+
 		std::vector<float> m_terrainTempMap; // row * with + col
 		m_terrainTempMap.resize(width * width);
-	
+
 		// Iterate through all tiles
 		for (int row = 0; row < width; row++)
 		{
@@ -396,9 +351,9 @@ namespace MonteCarlo {
 			for (int col = 0; col < width; col++)
 			{
 				float N = 0.f;
-				if (g_terrain.GetInfluenceMapValue(row,col) < 0.f)
+				if (g_terrain.GetInfluenceMapValue(row, col) < 0.f)
 				{
-					m_terrainTempMap[row * width + col] = g_terrain.GetInfluenceMapValue(row,col);
+					m_terrainTempMap[row * width + col] = g_terrain.GetInfluenceMapValue(row, col);
 					continue;
 				}
 				// Checking the neighbours
@@ -424,7 +379,7 @@ namespace MonteCarlo {
 				m_terrainTempMap[row * width + col] = g_terrain.Lerp(g_terrain.GetInfluenceMapValue(row, col), N, growing);
 			}
 		}
-	
+
 		// Setting the influence values into the map
 		for (int row = 0; row < width; row++)
 		{
@@ -432,10 +387,10 @@ namespace MonteCarlo {
 			{
 				if (!(row % 3 == 2 && col % 3 == 2))
 				{
-					if(row % 3 == 2)
+					if (row % 3 == 2)
 						g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col]);
 					if (col % 3 == 2)
-						g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col] - m_terrainTempMap[row * width + col]/1000.f);
+						g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col] - m_terrainTempMap[row * width + col] / 1000.f);
 				}
 			}
 		}
@@ -501,6 +456,52 @@ namespace MonteCarlo {
 		}
 
 		return wall_tile;
-	
+
+	}
+
+	MonteCarloTree::Node::Node() : mParent(nullptr), mState(nullptr), mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(false) {
+
+	}
+
+	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI) : mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(AI),
+	mState(new State(tile, mAI, wallPlacement)){
+		//add parent as parent pointer
+		mParent = parent;
+
+		//add this node to the children vector of parent
+		parent->mChildren.push_back(this);
+	}
+
+	MonteCarloTree::Node::~Node() {
+		delete mState;
+	}
+
+	void MonteCarloTree::Node::CreateChildren(QuoridorPlayer* q) {
+		//get grandparent node (the previous move for the plyaer)
+		Node* grandParent = this->mParent ? this->mParent : nullptr;
+		//if not grandparent get current board position state
+		State previousState = grandParent ? *grandParent->mState 
+			: State(q->GetTile(), !this->mAI, false);
+
+		TileQ up(previousState.mRow + 1, previousState.mColumn);
+		TileQ right(previousState.mRow, previousState.mColumn + 1);
+		TileQ left(previousState.mRow, previousState.mColumn - 1);
+		TileQ down(previousState.mRow - 1, previousState.mColumn);
+
+		//create all possible moves
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), up))
+			new Node(this, up, false, previousState.mAI);
+
+		//wall placement
+		new Node(this, TileQ(previousState.mRow, previousState.mColumn), true, previousState.mAI);
+
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), right))
+			new Node(this, right, false, previousState.mAI);
+		//
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), left))
+			new Node(this, left, false, previousState.mAI);
+		//
+		if (q->IsLegalMove(TileQ(previousState.mRow, previousState.mColumn), down))
+			new Node(this, down, false, previousState.mAI);
 	}
 }

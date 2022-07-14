@@ -64,14 +64,12 @@ namespace MonteCarlo {
 
 	struct Simulator {
 		bool Simulate(TileQ& AITile, TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
-		State& RollOut(const State currentState, QuoridorPlayer* q, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
 
 	private:
 		int mPlayerRow, mPlayerColumn;
 		int mAIRow, mAIColumn;
 
-		void PlaceWall() {};
-
-		TileQ Propagation(TileQ origin, bool propagation_up, float decay, float growing);
+		State& RollOut(const State currentState, QuoridorPlayer* q, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
+		const TileQ& PlaceWall(const TileQ& origin, bool propagation_up, float decay = 0.05f, float growing = 0.15f);
 	};
 }
