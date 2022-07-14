@@ -453,7 +453,7 @@ namespace MonteCarlo {
 							}
 							else if (quoridor_tile.row != 0)
 							{
-								quoridor_tile.row--;
+								quoridor_tile.col--;
 								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
 								{
 									max_influence = influence;
@@ -473,7 +473,7 @@ namespace MonteCarlo {
 							}
 							else if (quoridor_tile.col != 0)
 							{
-								quoridor_tile.col--;
+								quoridor_tile.row--;
 								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
 								{
 									max_influence = influence;
