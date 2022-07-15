@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(100),
+		mMaximumIterations(10),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -263,7 +263,6 @@ namespace MonteCarlo {
 		//During simulation the moves are chosen with respect to a function called rollout policy function (which has some biased stats)
 		while (1) {
 			if (AIStarts) {
-				AIStarts = true;
 				//AI simulation turn
 				if (AIState.IsTerminal()) {
 					return true; //AI WIN
@@ -286,6 +285,8 @@ namespace MonteCarlo {
 				AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
 			mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
 			AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
+
+			AIStarts = true;
 		}
 	}
 
@@ -299,7 +300,7 @@ namespace MonteCarlo {
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			if (movingQuoridor->GetWalls() > 0) {
+			if (movingQuoridor->m_Simulation_walls > 0) {
 				posibleMoves.push_back(Moves::M_PLACE_WALL);
 				posibleMoves.push_back(Moves::M_PLACE_WALL);
 				posibleMoves.push_back(Moves::M_PLACE_WALL);
