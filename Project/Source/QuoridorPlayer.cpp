@@ -554,7 +554,11 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
+				{
+					RemoveWallClone(tile);
 					return true;
+				}
+				RemoveWallClone(tile);
 			}
 		}
 		// If in the end of the board
@@ -566,7 +570,11 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
+				{
+					RemoveWallClone(tile);
 					return true;
+				}
+				RemoveWallClone(tile);
 			}
 		}
 	}
@@ -583,7 +591,11 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
+				{
+					RemoveWallClone(tile);
 					return true;
+				}
+				RemoveWallClone(tile);
 			}
 		}
 		// If in the end of the board
@@ -595,7 +607,11 @@ bool QuoridorPlayer::IsLegalWall(TileQ origin_tile, TileQ tile)
 			{
 				SetWallClone(tile);
 				if (IsLegalWallAfterPathfinding(origin_tile, tile))
+				{
+					RemoveWallClone(tile);
 					return true;
+				}
+				RemoveWallClone(tile);
 			}
 		}
 	}
@@ -681,6 +697,47 @@ void QuoridorPlayer::SetWallClone(const TileQ tile)
 		clone_map.PlaceWall(tile.row * 3 + offset + 2, tile.col * 3 + 2);
 		clone_map.PlaceWall(tile.row * 3 + offset + 3, tile.col * 3 + 2);
 		clone_map.PlaceWall(tile.row * 3 + offset + 4, tile.col * 3 + 2);
+	}
+}
+
+void QuoridorPlayer::RemoveWallClone(const TileQ tile)
+{
+	DebugDrawingColor color = DEBUG_COLOR_YELLOW;
+
+	int width = g_terrain.GetWidth() / 3;
+
+	// Setting 2x1 wall
+	if (tile.half_row)
+	{
+		int offset = 0;
+		if (tile.col == width)
+			offset = -3;
+
+		Map clone_map = g_terrain.GetCloneMap();
+
+		// Setting tiles
+		clone_map.RemoveWall(tile.row * 3 + 2, tile.col * 3 + offset + 0);
+		clone_map.RemoveWall(tile.row * 3 + 2, tile.col * 3 + offset + 1);
+		clone_map.RemoveWall(tile.row * 3 + 2, tile.col * 3 + offset + 2);
+		clone_map.RemoveWall(tile.row * 3 + 2, tile.col * 3 + offset + 3);
+		clone_map.RemoveWall(tile.row * 3 + 2, tile.col * 3 + offset + 4);
+	}
+
+	// Setting 1x2 wall
+	if (tile.half_col)
+	{
+		int offset = 0;
+		if (tile.row == width)
+			offset = -3;
+
+		Map clone_map = g_terrain.GetCloneMap();
+
+		// Setting tiles
+		clone_map.RemoveWall(tile.row * 3 + offset + 0, tile.col * 3 + 2);
+		clone_map.RemoveWall(tile.row * 3 + offset + 1, tile.col * 3 + 2);
+		clone_map.RemoveWall(tile.row * 3 + offset + 2, tile.col * 3 + 2);
+		clone_map.RemoveWall(tile.row * 3 + offset + 3, tile.col * 3 + 2);
+		clone_map.RemoveWall(tile.row * 3 + offset + 4, tile.col * 3 + 2);
 	}
 }
 
