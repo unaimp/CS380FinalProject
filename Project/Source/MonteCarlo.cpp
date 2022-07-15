@@ -579,6 +579,24 @@ namespace MonteCarlo {
 
 	}
 
+	TileQ Simulator::PlaceWallRandom(const TileQ& origin)
+	{
+		srand(time(NULL));
+
+		TileQ random_tile;
+		random_tile.row = rand() % (12 - 0 + 1) + 0;
+		random_tile.col = rand() % (12 - 0 + 1) + 0;
+		if (rand() % 2 == 0)
+			random_tile.half_row = true;
+		else
+			random_tile.half_col = true;
+
+		if (g_database.Find("NPC")->GetQuoridor().IsLegalWall(origin, random_tile))
+			return random_tile;
+		else
+			return TileQ();
+	}
+
 	MonteCarloTree::Node::Node() : mParent(nullptr), mState(nullptr), mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(false) {
 
 	}
