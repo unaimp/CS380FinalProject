@@ -329,7 +329,20 @@ namespace MonteCarlo {
 			break;
 		case Moves::M_PLACE_WALL:
 			TileQ otherPlayerTile = otherPlayer->GetTile();
-			movingQuoridor->SetWallClone(PlaceWall(otherPlayerTile, AITurn));
+			TileQ placedWall = PlaceWall(otherPlayerTile, AITurn);
+			if (placedWall.row == 0 && placedWall.col == 0 && !placedWall.half_col && !placedWall.half_row) { //illegal placement
+				for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
+					if (*it == Moves::M_PLACE_WALL) {
+						it = posibleMoves.erase(it);
+					}
+					else {
+						it++;
+					}
+				}
+				return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
+			}
+
+			movingQuoridor->SetWallClone(placedWall);
 			return State(currentState.mTile, AITurn, true);
 		}
 
