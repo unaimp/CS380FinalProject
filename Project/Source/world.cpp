@@ -92,12 +92,12 @@ void World::Initialize( CMultiAnim *pMA, std::vector< CTiny* > *pv_pChars, CSoun
 
 	{	//Agent
 		GameObject* agent = new GameObject( g_database.GetNewObjectID(), OBJECT_Player, "Player" );
-		TileQ pos(0, 6);
+		TileQ pos(0, 4);
 		agent->CreateQuoridor( true, pos );
 		g_database.Store( *agent );
 
 		GameObject* npc = new GameObject(g_database.GetNewObjectID(), OBJECT_Player, "NPC");
-		TileQ posnpc(12, 6);
+		TileQ posnpc(8, 4);
 		//TileQ posnpc(1, 4);
 		npc->CreateQuoridor(false, posnpc);
 		g_database.Store(*npc);
