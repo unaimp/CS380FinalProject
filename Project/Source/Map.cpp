@@ -107,7 +107,7 @@ void Map::PlaceWall(int row, int col)
 	curTile = Tile::TILE_WALL;
 }
 
-void Map::RemoveWall(int &row, int &col)
+void Map::RemoveWall(int row, int col)
 {
 	if (row < 0 || row >= m_width)
 		return;
