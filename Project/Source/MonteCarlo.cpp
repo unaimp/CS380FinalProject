@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(10000),
+		mMaximumIterations(100),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -61,6 +61,10 @@ namespace MonteCarlo {
 			g_terrain.CloneMap();
 
 			mCurrentIterations++;
+
+			//set how many walls each player has before simulation
+			mHumanPlayer->m_Simulation_walls = mHumanPlayer->m_walls;
+			mAIPlayer->m_Simulation_walls = mAIPlayer->m_walls;
 
 			//Principle of operations
 			Node* leafNode = Selection(mRoot);
@@ -211,11 +215,13 @@ namespace MonteCarlo {
 			if (node->mAI) {
 				TileQ wall = mSimulator->PlaceWall(playerTile, true);
 				mAIPlayer->SetWallClone(wall);
+				mAIPlayer->m_Simulation_walls--;
 				node->mState->mTile = wall;
 			}
 			else {
 				TileQ wall = mSimulator->PlaceWall(aiTile, false);
 				mHumanPlayer->SetWallClone(wall);
+				mHumanPlayer->m_Simulation_walls--;
 				node->mState->mTile = wall;
 			}
 		}
@@ -332,21 +338,14 @@ namespace MonteCarlo {
 
 			break;
 		case Moves::M_PLACE_WALL:
-			TileQ otherPlayerTile = otherPlayer->GetTile();
-			TileQ placedWall = PlaceWall(otherPlayerTile, AITurn);
-			if (placedWall.row == 0 && placedWall.col == 0 && !placedWall.half_col && !placedWall.half_row) { //illegal placement
-				for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
-					if (*it == Moves::M_PLACE_WALL) {
-						it = posibleMoves.erase(it);
-					}
-					else {
-						it++;
-					}
-				}
-				return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
-			}
+			TileQ wall;
+			do {
+				TileQ origin = movingQuoridor->GetTile();
+				wall = PlaceWallRandom(origin, movingQuoridor);
+			} while (wall.row == -1);
 
-			movingQuoridor->SetWallClone(placedWall);
+			movingQuoridor->SetWallClone(wall);
+			movingQuoridor->m_Simulation_walls--;
 			return State(currentState.mTile, AITurn, true);
 		}
 
@@ -579,7 +578,7 @@ namespace MonteCarlo {
 
 	}
 
-	TileQ Simulator::PlaceWallRandom(const TileQ& origin)
+	TileQ Simulator::PlaceWallRandom(const TileQ& origin, QuoridorPlayer* q)
 	{
 		srand(time(NULL));
 
@@ -591,7 +590,7 @@ namespace MonteCarlo {
 		else
 			random_tile.half_col = true;
 
-		if (g_database.Find("NPC")->GetQuoridor().IsLegalWall(origin, random_tile))
+		if (q->IsLegalWall(origin, random_tile))
 			return random_tile;
 		else
 			return TileQ();
