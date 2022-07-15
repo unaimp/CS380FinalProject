@@ -351,7 +351,7 @@ namespace MonteCarlo {
 		}
 	}
 
-	void Simulator::InfluenceUp(TileQ tile, float influence, int separation_value, bool last_was_separation)
+	/*void Simulator::InfluenceUp(TileQ tile, float influence, int separation_value, bool last_was_separation)
 	{
 		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
 		if (row+2 == g_terrain.GetWidth() && influence <= 0.f)
@@ -435,7 +435,7 @@ namespace MonteCarlo {
 			else
 				InfluenceDown(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
 		}
-	}
+	}*/
 
 	//Places a wall using propagation logic
 	const TileQ& Simulator::PlaceWall(const TileQ& origin, bool propagation_up, float decay, float growing)
@@ -477,6 +477,9 @@ namespace MonteCarlo {
 			return TileQ(origin.row, origin.col, false, true);
 		if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col, false, true)))
 			return TileQ(origin.row - 1, origin.col, false, true);
+
+		// THIS IS A NON VALID WALL PLACEMENT
+		return TileQ();
 
 		//std::vector<float> m_terrainTempMap; // row * with + col
 		//m_terrainTempMap.resize(width * width);
