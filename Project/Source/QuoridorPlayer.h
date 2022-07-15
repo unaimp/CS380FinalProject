@@ -33,7 +33,6 @@ public:
 	bool IsLegalWallAfterPathfinding(TileQ origin_tile, TileQ tile);
 	void SetTileClone(TileQ tile, bool ontile);
 	void SetWallClone(const TileQ tile);
-	void RemoveWallClone(const TileQ tile);
 
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }

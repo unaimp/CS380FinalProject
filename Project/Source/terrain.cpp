@@ -103,8 +103,8 @@ void Terrain::NextMap( void )
 	{
 		if (m_nextMap == 0)
 		{
-			player->GetQuoridor().SetPlayerInTile(0, 4);
-			npc->GetQuoridor().SetPlayerInTile(8, 4);
+			player->GetQuoridor().SetPlayerInTile(0, 6);
+			npc->GetQuoridor().SetPlayerInTile(12, 6);
 		}
 		if (m_nextMap == 1)
 		{

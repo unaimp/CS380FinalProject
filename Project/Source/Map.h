@@ -75,7 +75,7 @@ public:
 	void SetCentralInfluence(int r, int c);
 
 	void PlaceWall(int row, int col);
-	void RemoveWall(int row, int col);
+	void RemoveWall(int &row, int &col);
 	void SaveMap(void);
 	inline std::wstring GetFileName(void) { return m_filename; };
 };
