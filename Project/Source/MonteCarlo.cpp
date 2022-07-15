@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(100),
+		mMaximumIterations(10000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -246,6 +246,10 @@ namespace MonteCarlo {
 	}
 
 
+	Simulator::Simulator() :
+		mAIRow(-1), mAIColumn(-1),
+		mPlayerRow(-1), mPlayerColumn(-1) {}
+
 	bool Simulator::Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts) {
 		State AIState = State(AITile, true, false);
 		State playerState = State(playerTile, false, false);
@@ -279,7 +283,7 @@ namespace MonteCarlo {
 		}
 	}
 
-	State& Simulator::RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, 
+	State Simulator::RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, 
 		bool AITurn, std::vector<Moves>& posibleMoves) {
 		//moves are not created yet
 		if (posibleMoves.empty()) {
@@ -451,7 +455,7 @@ namespace MonteCarlo {
 	}*/
 
 	//Places a wall using propagation logic
-	const TileQ& Simulator::PlaceWall(const TileQ& origin, bool propagation_up, float decay, float growing)
+	TileQ Simulator::PlaceWall(const TileQ& origin, bool propagation_up, float decay, float growing)
 	{
 		int width = g_terrain.GetWidth();
 

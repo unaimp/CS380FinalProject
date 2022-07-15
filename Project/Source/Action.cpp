@@ -2,6 +2,9 @@
 
 using namespace MonteCarlo;
 
+State::State() : mAI(false), mWallPlacement(false) {
+
+}
 
 State::State(TileQ tile, bool AI, bool wallplacement)
 	: mAI(AI), mTile(tile), mWallPlacement(wallplacement) {

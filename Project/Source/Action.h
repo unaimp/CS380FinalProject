@@ -13,6 +13,7 @@ namespace MonteCarlo {
 
 
 	struct State {
+		State();
 		State(TileQ tile, bool AI, bool wallplacement);
 		//State of the player from where take following actions
 		TileQ mTile;
