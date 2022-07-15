@@ -637,7 +637,7 @@ void QuoridorPlayer::SetTileClone(TileQ tile, bool ontile)
 	g_terrain.SetCloneColor(tile.row * 3 + 1, tile.col * 3 + 1, color);
 }
 
-void QuoridorPlayer::SetWallClone(const TileQ& tile)
+void QuoridorPlayer::SetWallClone(const TileQ tile)
 {
 	DebugDrawingColor color = DEBUG_COLOR_YELLOW;
 
@@ -865,6 +865,7 @@ bool QuoridorPlayer::WallCheck(int or , int oc, int r, int c)
 	// If it's a diagonal
 	if (IsDiagonal(or , oc, r, c))
 	{
+		return true;
 		// If the diagonal is on the right
 		if (or < r)
 		{

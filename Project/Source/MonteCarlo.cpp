@@ -351,84 +351,151 @@ namespace MonteCarlo {
 		}
 	}
 
+	void Simulator::InfluenceUp(TileQ tile, float influence, int separation_value, bool last_was_separation)
+	{
+		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
+		if (row+2 == g_terrain.GetWidth() && influence <= 0.f)
+			return;
+
+		if (!g_terrain.IsWallClone(row + 2, col))
+		{
+			g_terrain.SetInfluenceCloneMapValue(row + 2, col + 0, influence);
+			g_terrain.SetInfluenceCloneMapValue(row + 2, col + 1, influence);
+			
+			//InfluenceUp(TileQ(tile.row+1, tile.col), influence - 0.1f, separation_value, false);
+		}
+		else if (separation_value != 0 && !last_was_separation)
+		{
+			InfluenceLeft(TileQ(tile.row, tile.col), influence, separation_value - 1, true, true);
+			InfluenceRight(TileQ(tile.row, tile.col), influence, separation_value - 1, true, true);
+		}
+	}
+
+	void Simulator::InfluenceDown(TileQ tile, float influence, int separation_value, bool last_was_separation)
+	{
+		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
+		if (row == 0 && influence <= 0.f)
+			return;
+
+		if (!g_terrain.IsWallClone(row - 1, col))
+		{
+			g_terrain.SetInfluenceCloneMapValue(row - 1, col + 0, influence);
+			g_terrain.SetInfluenceCloneMapValue(row - 1, col + 1, influence);
+
+			InfluenceDown(TileQ(tile.row - 1, tile.col), influence - 0.1f, separation_value, false);
+		}
+		else if (separation_value != 0 && !last_was_separation)
+		{
+			InfluenceLeft(TileQ(tile.row, tile.col), influence, separation_value - 1, true, false);
+			InfluenceRight(TileQ(tile.row, tile.col), influence, separation_value - 1, true, false);
+		}
+	}
+
+	void Simulator::InfluenceLeft(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up)
+	{
+		if (influence <= 0.f)
+			return;
+
+		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
+
+		if (col != 0 && !g_terrain.IsWallClone(row, col - 1))
+		{
+			g_terrain.SetInfluenceCloneMapValue(row + 0, col - 1, influence);
+			g_terrain.SetInfluenceCloneMapValue(row + 1, col - 1, influence);
+
+			InfluenceLeft(TileQ(tile.row, tile.col - 1), influence - 0.1f, separation_value, false, go_up);
+		}
+		else if (separation_value != 0 && !last_was_separation)
+		{
+			if (go_up)
+				InfluenceUp(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
+			else
+				InfluenceDown(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
+		}
+	}
+
+	void Simulator::InfluenceRight(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up)
+	{
+		if (influence <= 0.f)
+			return;
+
+		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
+
+		if (col != 0 && !g_terrain.IsWallClone(row, col + 2))
+		{
+			g_terrain.SetInfluenceCloneMapValue(row + 0, col + 2, influence);
+			g_terrain.SetInfluenceCloneMapValue(row + 1, col + 2, influence);
+
+			InfluenceRight(TileQ(tile.row, tile.col + 1), influence - 0.1f, separation_value, false, go_up);
+		}
+		else if (separation_value != 0 && !last_was_separation)
+		{
+			if (go_up)
+				InfluenceUp(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
+			else
+				InfluenceDown(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
+		}
+	}
+
 	//Places a wall using propagation logic
 	const TileQ& Simulator::PlaceWall(const TileQ& origin, bool propagation_up, float decay, float growing)
 	{
 		int width = g_terrain.GetWidth();
-
-		g_terrain.GetCloneMap().SetCentralInfluence(origin.row, origin.col);
 
 		QuoridorPlayer quoridor(g_database.Find("NPC")->GetQuoridor());
 
 		if (!propagation_up)
 			quoridor = g_database.Find("Player")->GetQuoridor();
 
-		std::vector<float> m_terrainTempMap; // row * with + col
-		m_terrainTempMap.resize(width * width);
+		int row = origin.row * 3, col = origin.col * 3;
 
-		// Iterate through all tiles
-		for (int row = 0; row < width; row++)
+		if (propagation_up)
 		{
-			int rmin, rmax;
-			if (propagation_up)
-			{
-				rmin = row;
-				rmax = min(row + 1, width - 1);
-			}
-			else
-			{
-				rmin = max(row - 1, 0);
-				rmax = row;
-			}
-
-			for (int col = 0; col < width; col++)
-			{
-				float N = 0.f;
-				if (g_terrain.GetInfluenceMapValue(row, col) < 0.f)
-				{
-					m_terrainTempMap[row * width + col] = g_terrain.GetInfluenceMapValue(row, col);
-					continue;
-				}
-				// Checking the neighbours
-				for (int r = rmin; r <= rmax; r++)
-				{
-					for (int c = max(col - 1, 0); c <= min(col + 1, width - 1); c++)
-					{
-						// Wall in the way, skip
-						if (quoridor.WallCheck2(row, col, r, c))
-							break;
-						// If center skip
-						if (r == row && c == col)
-							continue;
-						// Getting the absolute of the neighbour
-						float dist = sqrtf((r - row) * (r - row) + (c - col) * (c - col));
-						float n = g_terrain.GetInfluenceMapValue(r, c) * exp(-dist * decay);
-						// Updating the highest absolute of all neighbour influence
-						if (abs(n) > abs(N))
-							N = n;
-					}
-				}
-				// Update temp layer
-				m_terrainTempMap[row * width + col] = g_terrain.Lerp(g_terrain.GetInfluenceMapValue(row, col), N, growing);
-			}
+			// Trying up wall
+			if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col, true, false)))
+				return TileQ(origin.row, origin.col, true, false);
+			if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col-1, true, false)))
+				return TileQ(origin.row, origin.col - 1, true, false);
+		}
+		else
+		{
+			// Trying down wall
+			if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col, true, false)))
+				return TileQ(origin.row - 1, origin.col, true, false);
+			if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col-1, true, false)))
+				return TileQ(origin.row - 1, origin.col - 1, true, false);
 		}
 
-		// Setting the influence values into the map
-		for (int row = 0; row < width; row++)
-		{
-			for (int col = 0; col < width; col++)
-			{
-				if (!(row % 3 == 2 && col % 3 == 2))
-				{
-					if (row % 3 == 2)
-						g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col]);
-					if (col % 3 == 2)
-						g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col] - m_terrainTempMap[row * width + col] / 1000.f);
-				}
-			}
-		}
+		// Trying left wall
+		if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col-1, false, true)))
+			return TileQ(origin.row, origin.col - 1, false, true);
+		if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col-1, false, true)))
+			return TileQ(origin.row - 1, origin.col - 1, false, true);
 
-		float max_influence = 0.f;
+		// Trying right wall
+		if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col, false, true)))
+			return TileQ(origin.row, origin.col, false, true);
+		if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col, false, true)))
+			return TileQ(origin.row - 1, origin.col, false, true);
+
+		//std::vector<float> m_terrainTempMap; // row * with + col
+		//m_terrainTempMap.resize(width * width);
+
+		//if (propagation_up)
+		//	InfluenceUp(origin, 1.f, 0, false);
+		//else
+		//	InfluenceDown(origin, 1.f, 0, false);
+
+		//// Setting the influence values into the map
+		//for (int row = 0; row < width; row++)
+		//{
+		//	for (int col = 0; col < width; col++)
+		//	{
+		//		g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col]);
+		//	}
+		//}
+
+		/*float max_influence = 0.f;
 		TileQ wall_tile;
 
 		// Setting the influence values into the map
@@ -451,16 +518,16 @@ namespace MonteCarlo {
 								wall_tile = quoridor_tile;
 								continue;
 							}
-							else if (quoridor_tile.row != 0)
-							{
-								quoridor_tile.col--;
-								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
-								{
-									max_influence = influence;
-									wall_tile = quoridor_tile;
-									continue;
-								}
-							}
+							//else if (quoridor_tile.row != 0)
+							//{
+							//	quoridor_tile.col--;
+							//	if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
+							//	{
+							//		max_influence = influence;
+							//		wall_tile = quoridor_tile;
+							//		continue;
+							//	}
+							//}
 						}
 						if (col % 3 == 2)
 						{
@@ -471,16 +538,16 @@ namespace MonteCarlo {
 								wall_tile = quoridor_tile;
 								continue;
 							}
-							else if (quoridor_tile.col != 0)
-							{
-								quoridor_tile.row--;
-								if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
-								{
-									max_influence = influence;
-									wall_tile = quoridor_tile;
-									continue;
-								}
-							}
+							//else if (quoridor_tile.col != 0)
+							//{
+							//	quoridor_tile.row--;
+							//	if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
+							//	{
+							//		max_influence = influence;
+							//		wall_tile = quoridor_tile;
+							//		continue;
+							//	}
+							//}
 						}
 
 					}
@@ -488,7 +555,7 @@ namespace MonteCarlo {
 			}
 		}
 
-		return wall_tile;
+		return wall_tile;*/
 
 	}
 

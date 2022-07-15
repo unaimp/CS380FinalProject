@@ -134,6 +134,9 @@ void Terrain::CloneMap()
 
 bool Terrain::IsWallClone(int r, int c)
 {
+	if (r < 0 || c < 0 || r >= m_width || c >= m_width)
+		return true;
+
 	if (m_map_clone.GetTile(r,c) == TILE_WALL)
 		return true;
 

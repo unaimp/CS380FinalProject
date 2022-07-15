@@ -66,6 +66,11 @@ namespace MonteCarlo {
 		bool Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
 		const TileQ& PlaceWall(const TileQ& origin, bool propagation_up, float decay = 0.05f, float growing = 0.15f);
 
+		//void InfluenceUp(TileQ tile, float influence, int separation_value, bool last_was_separation);
+		//void InfluenceDown(TileQ tile, float influence, int separation_value, bool last_was_separation);
+		//void InfluenceLeft(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up);
+		//void InfluenceRight(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up);
+
 	private:
 		int mPlayerRow, mPlayerColumn;
 		int mAIRow, mAIColumn;
