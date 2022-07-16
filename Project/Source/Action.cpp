@@ -21,7 +21,7 @@ bool State::IsTerminal() {
 		return false;
 	}
 	else {
-		if (mTile.row == 12)
+		if (mTile.row == 8)
 			return true;
 
 

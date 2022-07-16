@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(10),
+		mMaximumIterations(4000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -90,9 +90,11 @@ namespace MonteCarlo {
 		for (auto& it : mRoot->mChildren) {
 			//print out data
 			if(it->mState->mWallPlacement)
-				ss << "Placing a wall in:  " << it->mState->mTile.row << ", " << it->mState->mTile.col << "has a value of: " << it->mTotalSimulationReward << std::endl;
+				ss << "Placing a wall in:  " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has a value of: " << it->mTotalSimulationReward
+				<< ". Visited times: " << it->mVisitedTimes << std::endl;
 			else
-				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward << std::endl;
+				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward 
+				<<". Visited times: " << it->mVisitedTimes << std::endl;
 
 			if (it->mTotalSimulationReward > higherValue) {
 				higherValue = it->mTotalSimulationReward;
@@ -213,16 +215,22 @@ namespace MonteCarlo {
 		//place the wall if this move does that
 		if (node->mState->mWallPlacement) {
 			if (node->mAI) {
-				TileQ wall = mSimulator->PlaceWall(playerTile, true);
+				TileQ wall;
+				do {
+					wall = mSimulator->PlaceWallRandom(playerTile, mAIPlayer);
+				} while (wall.row == -1);
+
 				mAIPlayer->SetWallClone(wall);
 				mAIPlayer->m_Simulation_walls--;
-				node->mState->mTile = wall;
 			}
 			else {
-				TileQ wall = mSimulator->PlaceWall(aiTile, false);
+				TileQ wall;
+				do {
+					wall = mSimulator->PlaceWallRandom(playerTile, mHumanPlayer);
+				} while (wall.row == -1);
+
 				mHumanPlayer->SetWallClone(wall);
 				mHumanPlayer->m_Simulation_walls--;
-				node->mState->mTile = wall;
 			}
 		}
 
@@ -244,7 +252,7 @@ namespace MonteCarlo {
 
 		//update values
 		if(aiWon)
-			node->mTotalSimulationReward ++;
+			node->mTotalSimulationReward++;
 
 		node->mVisitedTimes++;
 
@@ -268,6 +276,7 @@ namespace MonteCarlo {
 					return true; //AI WIN
 				}
 				AIState = RollOut(AIState, AI, player, true);
+
 				//set new position on clone map
 				if(mAIRow >= 0)
 					AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
@@ -280,11 +289,12 @@ namespace MonteCarlo {
 				return false; //Human WIN
 			}
 			playerState = RollOut(playerState, player, AI, false);
+
 			//set new position on clone map
 			if (mPlayerRow >= 0)
-				AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
+				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
 			mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
-			AI->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
+			player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
 
 			AIStarts = true;
 		}
@@ -301,9 +311,9 @@ namespace MonteCarlo {
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			if (movingQuoridor->m_Simulation_walls > 0) {
-				posibleMoves.push_back(Moves::M_PLACE_WALL);
-				posibleMoves.push_back(Moves::M_PLACE_WALL);
-				posibleMoves.push_back(Moves::M_PLACE_WALL);
+				//posibleMoves.push_back(Moves::M_PLACE_WALL);
+				//posibleMoves.push_back(Moves::M_PLACE_WALL);
+				//posibleMoves.push_back(Moves::M_PLACE_WALL);
 			}
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
@@ -341,6 +351,7 @@ namespace MonteCarlo {
 		case Moves::M_PLACE_WALL:
 			TileQ wall;
 			do {
+				std::cout << "trying to place a wall in simulation" << std::endl;
 				TileQ origin = movingQuoridor->GetTile();
 				wall = PlaceWallRandom(origin, movingQuoridor);
 			} while (wall.row == -1);
@@ -584,8 +595,8 @@ namespace MonteCarlo {
 		srand(time(NULL));
 
 		TileQ random_tile;
-		random_tile.row = rand() % (12 - 0 + 1) + 0;
-		random_tile.col = rand() % (12 - 0 + 1) + 0;
+		random_tile.row = rand() % (8 - 0 + 1) + 0;
+		random_tile.col = rand() % (8 - 0 + 1) + 0;
 		if (rand() % 2 == 0)
 			random_tile.half_row = true;
 		else
@@ -629,18 +640,18 @@ namespace MonteCarlo {
 		//create all possible moves
 		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), up))
 			new Node(this, up, false, previousState.mAI);
+		//
+		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), down))
+			new Node(this, down, false, previousState.mAI);
 
 		//wall placement
 		if(q->GetWalls() > 0)
-			new Node(this, TileQ(previousState.mTile.row, previousState.mTile.col), true, previousState.mAI);
+			new Node(this, previousState.mTile, true, previousState.mAI);
 
 		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), right))
 			new Node(this, right, false, previousState.mAI);
 		//
 		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), left))
 			new Node(this, left, false, previousState.mAI);
-		//
-		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), down))
-			new Node(this, down, false, previousState.mAI);
 	}
 }
