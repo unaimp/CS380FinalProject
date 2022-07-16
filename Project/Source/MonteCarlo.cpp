@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(1000),
+		mMaximumIterations(7500),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -61,10 +61,6 @@ namespace MonteCarlo {
 			g_terrain.CloneMap();
 
 			mCurrentIterations++;
-
-			//set how many walls each player has before simulation
-			mHumanPlayer->m_Simulation_walls = mHumanPlayer->m_walls;
-			mAIPlayer->m_Simulation_walls = mAIPlayer->m_walls;
 
 			//Principle of operations
 			Node* leafNode = Selection(mRoot);
@@ -179,10 +175,7 @@ namespace MonteCarlo {
 		}
 		else {
 			//create this node children actions and rollout from one of them
-			if(leafNode->mAI)
-				leafNode->CreateChildren(mHumanPlayer);
-			else
-				leafNode->CreateChildren(mAIPlayer);
+			leafNode->CreateChildren(mAIPlayer, mHumanPlayer);
 
 			return leafNode->mChildren[0];
 		}
@@ -218,25 +211,12 @@ namespace MonteCarlo {
 		//place the wall if this move does that
 		if (node->mState->mWallPlacement) {
 			if (node->mAI) {
-				State firstSimulationMove = mSimulator->RollOut(State(aiTile, true, true), mAIPlayer, mHumanPlayer, true,
-					std::vector<Moves>(), true);
-
-				mAIPlayer->SetWallClone(firstSimulationMove.mWall);
-				mAIPlayer->m_Simulation_walls--;
-				//set wall tile
-				node->mState->mWall = firstSimulationMove.mWall;
+				mAIPlayer->SetWallClone(node->mState->mWall);
 			}
 			else {
-				State firstSimulationMove = mSimulator->RollOut(State(playerTile, false, true), mHumanPlayer, mAIPlayer, false,
-					std::vector<Moves>(), true);
-
-				mHumanPlayer->SetWallClone(firstSimulationMove.mWall);
-				mHumanPlayer->m_Simulation_walls--;
-				//set wall tile
-				node->mState->mWall = firstSimulationMove.mWall;
+				mHumanPlayer->SetWallClone(node->mState->mWall);
 			}
 		}
-
 
 		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, node->mAI);
 
@@ -282,16 +262,9 @@ namespace MonteCarlo {
 				AIState = RollOut(AIState, AI, player, true);
 
 				//set new position on clone map if not wall placement
-				if (AIState.mWallPlacement == false) {
-					AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
-					mAIRow = AIState.mTile.row;		mAIColumn = AIState.mTile.col;
-					AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
-				}
-				else {
-					//place the wall in clone map
-					AI->SetWallClone(playerState.mWall);
-					AI->m_Simulation_walls--;
-				}
+				AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
+				mAIRow = AIState.mTile.row;		mAIColumn = AIState.mTile.col;
+				AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
 			}
 
 			//player simulation turn
@@ -301,66 +274,31 @@ namespace MonteCarlo {
 			playerState = RollOut(playerState, player, AI, false);
 
 			//set new position on clone map if not wall placement
-			if (playerState.mWallPlacement == false) {
-				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
-				mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
-				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
-			}
-			else {
-				//place the wall in clone map
-				player->SetWallClone(playerState.mWall);
-				player->m_Simulation_walls--;
-			}
+			player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
+			mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
+			player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
 
 			AIStarts = true;
 		}
 	}
 
 	State Simulator::RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, 
-		bool AITurn, std::vector<Moves>& posibleMoves, bool onlyWallPlacing) {
+		bool AITurn, std::vector<Moves>& posibleMoves) {
 
 		//moves are not created yet
 		if (posibleMoves.empty()) {
 			//BIASED ACTIONS
-			if (movingQuoridor->m_Simulation_walls == 0 || !onlyWallPlacing) {
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_FWD);
-				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
-				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
-				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
-				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
-				posibleMoves.push_back(Moves::M_MOVE_LEFT);
-				posibleMoves.push_back(Moves::M_MOVE_LEFT);
-				posibleMoves.push_back(Moves::M_MOVE_LEFT);
-				posibleMoves.push_back(Moves::M_MOVE_LEFT);
-				posibleMoves.push_back(Moves::M_MOVE_BACKWD);
-				posibleMoves.push_back(Moves::M_MOVE_BACKWD);
-			}
-			if (movingQuoridor->m_Simulation_walls > 0) {
-				posibleMoves.push_back(Moves::M_WALL_FWD_A);
-				posibleMoves.push_back(Moves::M_WALL_FWD_A);
-				posibleMoves.push_back(Moves::M_WALL_FWD_A);
-				posibleMoves.push_back(Moves::M_WALL_FWD_B);
-				posibleMoves.push_back(Moves::M_WALL_FWD_B);
-				posibleMoves.push_back(Moves::M_WALL_FWD_B);
-				posibleMoves.push_back(Moves::M_WALL_LEFT_A);
-				posibleMoves.push_back(Moves::M_WALL_LEFT_B);
-				posibleMoves.push_back(Moves::M_WALL_RIGHT_A);
-				posibleMoves.push_back(Moves::M_WALL_RIGHT_B);
-			}
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
+			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
+			posibleMoves.push_back(Moves::M_MOVE_LEFT);
+			posibleMoves.push_back(Moves::M_MOVE_LEFT);
+			posibleMoves.push_back(Moves::M_MOVE_BACKWD);
+			
 		}
 
 		//randomizer for next move
@@ -391,92 +329,25 @@ namespace MonteCarlo {
 			else
 				destinationTile = TileQ(currentState.mTile.row - 1, currentState.mTile.col);
 			break;
-		case Moves::M_WALL_FWD_A:
-			wall_check = true;
-			if (AITurn)
-				destinationTile = TileQ(mPlayerRow, mPlayerColumn, true, false);
-			else
-				destinationTile = TileQ(mAIRow - 1, mAIColumn, true, false);
-
-			break;
-		case Moves::M_WALL_FWD_B:
-			wall_check = true;
-			if (AITurn)
-				destinationTile = TileQ(mPlayerRow, mPlayerColumn - 1, true, false);
-			else
-				destinationTile = TileQ(mAIRow - 1, mAIColumn - 1, true, false);
-
-			break;
-		case Moves::M_WALL_RIGHT_A:
-			wall_check = true;
-			if (AITurn)
-				destinationTile = TileQ(mPlayerRow, mPlayerColumn, false, true);
-			else
-				destinationTile = TileQ(mAIRow - 1, mAIColumn, false, true);
-
-			break;
-		case Moves::M_WALL_RIGHT_B:
-			wall_check = true;
-			if (AITurn)
-				destinationTile = TileQ(mPlayerRow - 1, mPlayerColumn, false, true);
-			else
-				destinationTile = TileQ(mAIRow, mAIColumn, false, true);
-		case Moves::M_WALL_LEFT_A:
-			wall_check = true;
-			if (AITurn)
-				destinationTile = TileQ(mPlayerRow, mPlayerColumn - 1, false, true);
-			else
-				destinationTile = TileQ(mAIRow - 1, mAIColumn - 1, false, true);
-
-			break;
-		case Moves::M_WALL_LEFT_B:
-			wall_check = true;
-			if (AITurn)
-				destinationTile = TileQ(mPlayerRow - 1, mPlayerColumn - 1, false, true);
-			else
-				destinationTile = TileQ(mAIRow, mAIColumn - 1, false, true);
-
-			break;
 		}
 
-		if (!wall_check)
-		{
-			if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
-				return State(destinationTile, AITurn, false);
-			}
-			else {
-				//erase this possibility from the vector
-				Moves movetoDelete = posibleMoves[randomNumber];
-				for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
-					if (*it == movetoDelete) {
-						it = posibleMoves.erase(it);
-					}
-					else {
-						it++;
-					}
+		if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
+			return State(destinationTile, AITurn, false);
+		}
+		else {
+			//erase this possibility from the vector
+			Moves movetoDelete = posibleMoves[randomNumber];
+			for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
+				if (*it == movetoDelete) {
+					it = posibleMoves.erase(it);
 				}
-				return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
-			}
-		}
-		else
-		{
-			if (movingQuoridor->IsLegalWall(currentState.mTile, destinationTile)) {
-				return State(currentState.mTile, AITurn, false, destinationTile);
-			}
-			else {
-				//erase this possibility from the vector
-				Moves movetoDelete = posibleMoves[randomNumber];
-				for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
-					if (*it == movetoDelete) {
-						it = posibleMoves.erase(it);
-					}
-					else {
-						it++;
-					}
+				else {
+					it++;
 				}
-				return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
 			}
+			return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
 		}
+		
 	}
 
 	/*void Simulator::InfluenceUp(TileQ tile, float influence, int separation_value, bool last_was_separation)
@@ -725,33 +596,77 @@ namespace MonteCarlo {
 		delete mState;
 	}
 
-	void MonteCarloTree::Node::CreateChildren(QuoridorPlayer* q) {
-		//get grandparent node (the previous move for the plyaer)
-		Node* grandParent = this->mParent ? this->mParent : nullptr;
-		//if not grandparent get current board position state
-		State previousState = grandParent ? *grandParent->mState 
-			: State(q->GetTile(), !this->mAI, false);
+	void MonteCarloTree::Node::CreateChildren(QuoridorPlayer* AI, QuoridorPlayer* player) {
+		//get current tree node position for both players
+		TileQ aiTile, humanTile;
+		//if this node has a parent, meaning this is not the first move
+		if (this->mParent) {
+			if (this->mAI) {
+				aiTile = this->mState->mTile;
+				humanTile = this->mParent->mState->mTile;
+			}
+			else {
+				 humanTile = this->mState->mTile;
+				 aiTile = this->mParent->mState->mTile;
+			}
+		}
+		else {
+			//this is first move, need to actually take board position
+			humanTile = this->mState->mTile;
+			aiTile = AI->GetTile();
+		}
 
-		TileQ up(previousState.mTile.row + 1, previousState.mTile.col);
-		TileQ right(previousState.mTile.row, previousState.mTile.col + 1);
-		TileQ left(previousState.mTile.row, previousState.mTile.col - 1);
-		TileQ down(previousState.mTile.row - 1, previousState.mTile.col);
+		TileQ previousTile = this->mAI ? humanTile : aiTile;
+		QuoridorPlayer* q = this->mAI ? player : AI;
 
-		//wall placement
-		if (q->GetWalls() > 0)
-			new Node(this, previousState.mTile, true, previousState.mAI);
+		TileQ up(previousTile.row + 1, previousTile.col);
+		TileQ right(previousTile.row, previousTile.col + 1);
+		TileQ left(previousTile.row, previousTile.col - 1);
+		TileQ down(previousTile.row - 1, previousTile.col);
+
 		//create all possible moves
-		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), up))
-			new Node(this, up, false, previousState.mAI);
+		if (q->IsLegalMove(previousTile, up))
+			new Node(this, up, false, !this->mAI);
 		//
-		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), down))
-			new Node(this, down, false, previousState.mAI);
+		if (q->IsLegalMove(previousTile, down))
+			new Node(this, down, false, !this->mAI);
 
-
-		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), right))
-			new Node(this, right, false, previousState.mAI);
+		if (q->IsLegalMove(previousTile, right))
+			new Node(this, right, false, !this->mAI);
 		//
-		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), left))
-			new Node(this, left, false, previousState.mAI);
+		if (q->IsLegalMove(previousTile, left))
+			new Node(this, left, false, !this->mAI);
+
+		//create all wall placement
+		if (q->GetWalls() > 0) {
+			if (this->mAI) {
+				if(q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, true, false)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, true, false));
+				if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, true, false)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, true, false));
+				if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row, aiTile.col, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col - 1, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row, aiTile.col - 1, false, true));
+			}
+			else {
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, true, false));
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
+			}
+		}
 	}
 }

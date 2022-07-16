@@ -12,7 +12,7 @@ namespace MonteCarlo {
 			Node(Node* parent, TileQ tile, bool wallPlacement, bool AI, TileQ wall = TileQ());
 			~Node();
 
-			void CreateChildren(QuoridorPlayer* q);
+			void CreateChildren(QuoridorPlayer* AI, QuoridorPlayer* player);
 
 			Node* mParent;
 			std::vector<Node*> mChildren;
@@ -65,7 +65,7 @@ namespace MonteCarlo {
 	struct Simulator {
 		Simulator();
 		bool Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
-		State RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>(), bool onlyWallPlacing = false);
+		State RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
 		TileQ PlaceWall(const TileQ& origin, bool propagation_up, float decay = 0.05f, float growing = 0.15f);
 
 		TileQ PlaceWallRandom(const TileQ& origin, QuoridorPlayer* q);
