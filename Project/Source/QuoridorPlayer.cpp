@@ -745,6 +745,9 @@ void QuoridorPlayer::Update()
 {
 	SetTile(m_tile, true);
 
+	if (g_terrain.IsEnd())
+		return;
+
 	if (m_type && g_terrain.IsPlayerTurn())
 	{
 		ResetTemp();
@@ -773,7 +776,10 @@ void QuoridorPlayer::Update()
 					{
 						SetTile(m_tile, false);
 						m_tile = tile_target;
-						g_terrain.ChangeTurn();
+						if (m_tile.row != g_terrain.GetWidth() / 3)
+							g_terrain.ChangeTurn();
+						else
+							g_terrain.SetEnd(false);
 					}
 				}
 			}
@@ -804,7 +810,10 @@ void QuoridorPlayer::Update()
 	}
 	else if(!m_type && !g_terrain.IsPlayerTurn()) {
 		g_database.mAILogic->Execute();
-		g_terrain.ChangeTurn();
+		if (m_tile.row != 0)
+			g_terrain.ChangeTurn();
+		else
+			g_terrain.SetEnd(true);
 	}
 }
 

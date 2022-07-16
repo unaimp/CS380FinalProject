@@ -19,7 +19,9 @@ Terrain::Terrain( void )
   m_width(40),
   m_quoridor_mode(0),
   m_mouse_click(false),
-  m_player_turn(true) 
+  m_player_turn(true),
+  m_end(false),
+  m_ai_end(false)
 {
 	// Create new maps from Maps directory
 	WCHAR pathBuffer[MAX_PATH];
@@ -119,6 +121,48 @@ void Terrain::NextMap( void )
 	}
 
 	g_database.SendMsgFromSystem(MSG_MapChange);
+}
+
+void Terrain::ResetMap(void)
+{
+	m_end = false;
+	m_player_turn = true;
+
+	Map& map = m_maps[m_nextMap];
+	map.Serialize(map.GetFileName());
+	m_map_clone.Serialize(map.GetFileName());
+	m_width = map.GetWidth();
+	m_terrain = map.GetTerrain();
+	m_terrainColor = map.GetTerrainColor();
+	m_terrainInfluenceMap = map.GetInfluenceMap();
+	m_timerUpdatePropagation = DEFAULT_UPDATEFREQUENCY;
+
+	ResetColors();
+	ResetInfluenceMap();
+	Analyze();
+
+	GameObject* player = g_database.Find("Player");
+	GameObject* npc = g_database.Find("NPC");
+	if (player != nullptr)
+	{
+		if (m_nextMap == 0)
+		{
+			player->GetQuoridor().SetPlayerInTile(0, 4);
+			npc->GetQuoridor().SetPlayerInTile(8, 4);
+		}
+		if (m_nextMap == 1)
+		{
+			player->GetQuoridor().SetPlayerInTile(0, 1);
+			npc->GetQuoridor().SetPlayerInTile(2, 1);
+		}
+		if (m_nextMap == 2)
+		{
+			player->GetQuoridor().SetPlayerInTile(0, 2);
+			npc->GetQuoridor().SetPlayerInTile(4, 2);
+		}
+	}
+
+	//g_database.SendMsgFromSystem(MSG_MapChange);
 }
 
 void Terrain::CloneMap()

@@ -117,6 +117,7 @@ D3DXVECTOR3				g_click3D;
 #define IDC_QUORY_MOVE          50
 #define IDC_QUORY_WALL          51
 #define IDC_QUORY_STAIR         52
+#define IDC_RESETMAP            53
 
 //--------------------------------------------------------------------------------------
 // Forward declarations
@@ -260,6 +261,8 @@ void InitApp()
 	g_SampleUI.AddButton(IDC_QUORY_MOVE, L"Player Quoridor Action", 45, iY, 120, 24);
 
 	g_SampleUI.AddButton(IDC_NEXTMAP, L"Next Map", 45, iY += 52, 120, 24);
+
+	g_SampleUI.AddButton(IDC_RESETMAP, L"Restart Game", 45, iY += 52, 120, 24);
 
 	/*
 	//g_SampleUI.AddButton(IDC_TOGGLECAM, L"Toggle Camera", 45, iY += 26, 120, 24);
@@ -876,6 +879,17 @@ void RenderText()
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	txtHelper.SetInsertionPos(5, y += 20);
 	txtHelper.DrawTextLine(ai);
+
+	// Print out Game Status
+	if (g_terrain.IsEnd())
+	{
+		txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		txtHelper.SetInsertionPos(5, y += 200);
+		if (g_terrain.DidAIWin())
+			txtHelper.DrawTextLine(L"NPC WIN");
+		else
+			txtHelper.DrawTextLine(L"PLAYER WIN");
+	}
 
 	/*// Print out Heuristic Weight
 	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
@@ -1553,6 +1567,11 @@ void CALLBACK OnGUIEvent(UINT nEvent, int nControlID, CDXUTControl* pControl, vo
 
 	case IDC_NEXTMAP:
 		g_terrain.NextMap();
+		break;
+
+	case IDC_RESETMAP:
+		g_database.mAILogic->Reset();
+		g_terrain.ResetMap();
 		break;
 
 	case IDC_TOGGLECAM:
