@@ -18,6 +18,7 @@ public:
 	void Update();
 
 	void SetPlayerInTile(int row, int col);
+	void SetWallCount(unsigned count) { m_walls = count; }
 
 	void SetTile(TileQ tile, bool ontile);
 	void SetTileTemp(TileQ tile);
