@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(4000),
+		mMaximumIterations(100),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -222,6 +222,8 @@ namespace MonteCarlo {
 
 				mAIPlayer->SetWallClone(wall);
 				mAIPlayer->m_Simulation_walls--;
+				//set wall tile
+				node->mState->mWall = wall;
 			}
 			else {
 				TileQ wall;
@@ -231,6 +233,8 @@ namespace MonteCarlo {
 
 				mHumanPlayer->SetWallClone(wall);
 				mHumanPlayer->m_Simulation_walls--;
+				//set wall tile
+				node->mState->mWall = wall;
 			}
 		}
 
@@ -277,11 +281,13 @@ namespace MonteCarlo {
 				}
 				AIState = RollOut(AIState, AI, player, true);
 
-				//set new position on clone map
-				if(mAIRow >= 0)
-					AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
-				mAIRow = AIState.mTile.row;		mAIColumn = AIState.mTile.col;
-				AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
+				//set new position on clone map if not wall placement
+				if (AIState.mWallPlacement == false) {
+					if (mAIRow >= 0)
+						AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
+					mAIRow = AIState.mTile.row;		mAIColumn = AIState.mTile.col;
+					AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
+				}
 			}
 
 			//player simulation turn
@@ -290,11 +296,13 @@ namespace MonteCarlo {
 			}
 			playerState = RollOut(playerState, player, AI, false);
 
-			//set new position on clone map
-			if (mPlayerRow >= 0)
-				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
-			mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
-			player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
+			//set new position on clone map if not wall placement
+			if (playerState.mWallPlacement == false) {
+				if (mPlayerRow >= 0)
+					player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
+				mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
+				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
+			}
 
 			AIStarts = true;
 		}
@@ -302,6 +310,7 @@ namespace MonteCarlo {
 
 	State Simulator::RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, 
 		bool AITurn, std::vector<Moves>& posibleMoves) {
+
 		//moves are not created yet
 		if (posibleMoves.empty()) {
 			//BIASED ACTIONS
@@ -310,8 +319,11 @@ namespace MonteCarlo {
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			if (movingQuoridor->m_Simulation_walls > 0) {
-				//posibleMoves.push_back(Moves::M_PLACE_WALL);
+				posibleMoves.push_back(Moves::M_PLACE_WALL);
 				//posibleMoves.push_back(Moves::M_PLACE_WALL);
 				//posibleMoves.push_back(Moves::M_PLACE_WALL);
 			}
@@ -351,15 +363,19 @@ namespace MonteCarlo {
 		case Moves::M_PLACE_WALL:
 			TileQ wall;
 			do {
-				std::cout << "trying to place a wall in simulation" << std::endl;
 				TileQ origin = movingQuoridor->GetTile();
 				wall = PlaceWallRandom(origin, movingQuoridor);
+				std::cout << "trying to place a wall in simulation" << std::endl;
 			} while (wall.row == -1);
 
 			movingQuoridor->SetWallClone(wall);
 			movingQuoridor->m_Simulation_walls--;
-			return State(currentState.mTile, AITurn, true);
+			return State(currentState.mTile, AITurn, true, wall);
 		}
+
+
+
+		std::cout << "-------------trying to move" << std::endl;
 
 		if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
 			return State(destinationTile, AITurn, false);
@@ -612,8 +628,8 @@ namespace MonteCarlo {
 
 	}
 
-	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI) : mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(AI),
-	mState(new State(tile, mAI, wallPlacement)){
+	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI, TileQ wall) : mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(AI),
+	mState(new State(tile, mAI, wallPlacement, wall)){
 		//add parent as parent pointer
 		mParent = parent;
 

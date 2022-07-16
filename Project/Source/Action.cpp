@@ -6,8 +6,8 @@ State::State() : mAI(false), mWallPlacement(false) {
 
 }
 
-State::State(TileQ tile, bool AI, bool wallplacement)
-	: mAI(AI), mTile(tile), mWallPlacement(wallplacement) {
+State::State(TileQ tile, bool AI, bool wallplacement, TileQ wall)
+	: mAI(AI), mTile(tile), mWallPlacement(wallplacement), mWall(wall) {
 	
 }
 
