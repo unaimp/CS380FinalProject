@@ -8,7 +8,13 @@ namespace MonteCarlo {
 		M_PLACE_WALL,
 		M_MOVE_RIGHT,
 		M_MOVE_LEFT,
-		M_MOVE_BACKWD
+		M_MOVE_BACKWD,
+		M_WALL_FWD_A,
+		M_WALL_FWD_B,
+		M_WALL_RIGHT_A,
+		M_WALL_RIGHT_B,
+		M_WALL_LEFT_A,
+		M_WALL_LEFT_B
 	};
 
 
