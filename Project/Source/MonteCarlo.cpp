@@ -7,7 +7,7 @@ namespace MonteCarlo {
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
 		mUCTvar(2.f),
-		mMaximumIterations(100),
+		mMaximumIterations(1000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -33,7 +33,7 @@ namespace MonteCarlo {
 		//create root node from AI position
 		mRoot = new Node();
 		mRoot->mVisitedTimes = 1; //not to simulate from here, first create possible children
-		mRoot->mState = new State(TileQ(mHumanPlayer->GetTile().row, mHumanPlayer->GetTile().col), false, false);
+		mRoot->mState = new State(mHumanPlayer->GetTile(), false, false);
 	}
 
 	void MonteCarloTree::End(void) {
@@ -90,7 +90,7 @@ namespace MonteCarlo {
 		for (auto& it : mRoot->mChildren) {
 			//print out data
 			if(it->mState->mWallPlacement)
-				ss << "Placing a wall in:  " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has a value of: " << it->mTotalSimulationReward
+				ss << "Placing a wall in:  " << it->mState->mWall.row << ", " << it->mState->mWall.col << " has a value of: " << it->mTotalSimulationReward
 				<< ". Visited times: " << it->mVisitedTimes << std::endl;
 			else
 				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward 
@@ -103,10 +103,10 @@ namespace MonteCarlo {
 		}
 
 
-		//print out data
+		//actual move
 		if (betterOption->mState->mWallPlacement) {
-			ss << "Placing a wall in: "<< betterOption->mState->mTile.row << ", " << betterOption->mState->mTile.col  <<  std::endl;
-			mAIPlayer->SetWall(betterOption->mState->mTile);
+			ss << "Placing a wall in: "<< betterOption->mState->mWall.row << ", " << betterOption->mState->mWall.col  <<  std::endl;
+			mAIPlayer->SetWall(betterOption->mState->mWall);
 			mAIPlayer->m_walls--;
 		}
 		else {
@@ -212,29 +212,28 @@ namespace MonteCarlo {
 				aiTile = mAIPlayer->GetTile();
 		}
 
+		mSimulator->mAIRow = aiTile.row;				mSimulator->mAIColumn = aiTile.col;
+		mSimulator->mPlayerRow = playerTile.row;		mSimulator->mPlayerColumn = playerTile.col;
+
 		//place the wall if this move does that
 		if (node->mState->mWallPlacement) {
 			if (node->mAI) {
-				TileQ wall;
-				do {
-					wall = mSimulator->PlaceWallRandom(playerTile, mAIPlayer);
-				} while (wall.row == -1);
+				State firstSimulationMove = mSimulator->RollOut(State(aiTile, true, true), mAIPlayer, mHumanPlayer, true,
+					std::vector<Moves>(), true);
 
-				mAIPlayer->SetWallClone(wall);
+				mAIPlayer->SetWallClone(firstSimulationMove.mWall);
 				mAIPlayer->m_Simulation_walls--;
 				//set wall tile
-				node->mState->mWall = wall;
+				node->mState->mWall = firstSimulationMove.mWall;
 			}
 			else {
-				TileQ wall;
-				do {
-					wall = mSimulator->PlaceWallRandom(playerTile, mHumanPlayer);
-				} while (wall.row == -1);
+				State firstSimulationMove = mSimulator->RollOut(State(playerTile, false, true), mHumanPlayer, mAIPlayer, false,
+					std::vector<Moves>(), true);
 
-				mHumanPlayer->SetWallClone(wall);
+				mHumanPlayer->SetWallClone(firstSimulationMove.mWall);
 				mHumanPlayer->m_Simulation_walls--;
 				//set wall tile
-				node->mState->mWall = wall;
+				node->mState->mWall = firstSimulationMove.mWall;
 			}
 		}
 
@@ -272,6 +271,7 @@ namespace MonteCarlo {
 		State AIState = State(AITile, true, false);
 		State playerState = State(playerTile, false, false);
 
+		
 		//During simulation the moves are chosen with respect to a function called rollout policy function (which has some biased stats)
 		while (1) {
 			if (AIStarts) {
@@ -283,10 +283,14 @@ namespace MonteCarlo {
 
 				//set new position on clone map if not wall placement
 				if (AIState.mWallPlacement == false) {
-					if (mAIRow >= 0)
-						AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
+					AI->SetTileClone(TileQ(mAIRow, mAIColumn), false);
 					mAIRow = AIState.mTile.row;		mAIColumn = AIState.mTile.col;
 					AI->SetTileClone(TileQ(mAIRow, mAIColumn), true);
+				}
+				else {
+					//place the wall in clone map
+					AI->SetWallClone(playerState.mWall);
+					AI->m_Simulation_walls--;
 				}
 			}
 
@@ -298,10 +302,14 @@ namespace MonteCarlo {
 
 			//set new position on clone map if not wall placement
 			if (playerState.mWallPlacement == false) {
-				if (mPlayerRow >= 0)
-					player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
+				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), false);
 				mPlayerRow = playerState.mTile.row;		mPlayerColumn = playerState.mTile.col;
 				player->SetTileClone(TileQ(mPlayerRow, mPlayerColumn), true);
+			}
+			else {
+				//place the wall in clone map
+				player->SetWallClone(playerState.mWall);
+				player->m_Simulation_walls--;
 			}
 
 			AIStarts = true;
@@ -309,29 +317,50 @@ namespace MonteCarlo {
 	}
 
 	State Simulator::RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, 
-		bool AITurn, std::vector<Moves>& posibleMoves) {
+		bool AITurn, std::vector<Moves>& posibleMoves, bool onlyWallPlacing) {
 
 		//moves are not created yet
 		if (posibleMoves.empty()) {
 			//BIASED ACTIONS
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			if (movingQuoridor->m_Simulation_walls > 0) {
-				posibleMoves.push_back(Moves::M_PLACE_WALL);
-				//posibleMoves.push_back(Moves::M_PLACE_WALL);
-				//posibleMoves.push_back(Moves::M_PLACE_WALL);
+			if (movingQuoridor->m_Simulation_walls == 0 || !onlyWallPlacing) {
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
+				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
+				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
+				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
+				posibleMoves.push_back(Moves::M_MOVE_RIGHT);
+				posibleMoves.push_back(Moves::M_MOVE_LEFT);
+				posibleMoves.push_back(Moves::M_MOVE_LEFT);
+				posibleMoves.push_back(Moves::M_MOVE_LEFT);
+				posibleMoves.push_back(Moves::M_MOVE_LEFT);
+				posibleMoves.push_back(Moves::M_MOVE_BACKWD);
+				posibleMoves.push_back(Moves::M_MOVE_BACKWD);
 			}
-			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
-			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
-			posibleMoves.push_back(Moves::M_MOVE_LEFT);
-			posibleMoves.push_back(Moves::M_MOVE_LEFT);
-			posibleMoves.push_back(Moves::M_MOVE_BACKWD);
+			if (movingQuoridor->m_Simulation_walls > 0) {
+				posibleMoves.push_back(Moves::M_WALL_FWD_A);
+				posibleMoves.push_back(Moves::M_WALL_FWD_A);
+				posibleMoves.push_back(Moves::M_WALL_FWD_A);
+				posibleMoves.push_back(Moves::M_WALL_FWD_B);
+				posibleMoves.push_back(Moves::M_WALL_FWD_B);
+				posibleMoves.push_back(Moves::M_WALL_FWD_B);
+				posibleMoves.push_back(Moves::M_WALL_LEFT_A);
+				posibleMoves.push_back(Moves::M_WALL_LEFT_B);
+				posibleMoves.push_back(Moves::M_WALL_RIGHT_A);
+				posibleMoves.push_back(Moves::M_WALL_RIGHT_B);
+			}
 		}
 
 		//randomizer for next move
@@ -361,19 +390,7 @@ namespace MonteCarlo {
 				destinationTile = TileQ(currentState.mTile.row + 1, currentState.mTile.col);
 			else
 				destinationTile = TileQ(currentState.mTile.row - 1, currentState.mTile.col);
-
 			break;
-		case Moves::M_PLACE_WALL:
-			do {
-				TileQ origin = movingQuoridor->GetTile();
-				wall = PlaceWallRandom(origin, movingQuoridor);
-				std::cout << "trying to place a wall in simulation" << std::endl;
-			} while (wall.row == -1);
-
-			movingQuoridor->SetWallClone(wall);
-			movingQuoridor->m_Simulation_walls--;
-			return State(currentState.mTile, AITurn, true);
-
 		case Moves::M_WALL_FWD_A:
 			wall_check = true;
 			if (AITurn)
@@ -444,7 +461,7 @@ namespace MonteCarlo {
 		else
 		{
 			if (movingQuoridor->IsLegalWall(currentState.mTile, destinationTile)) {
-				return State(destinationTile, AITurn, false);
+				return State(currentState.mTile, AITurn, false, destinationTile);
 			}
 			else {
 				//erase this possibility from the vector
@@ -720,6 +737,9 @@ namespace MonteCarlo {
 		TileQ left(previousState.mTile.row, previousState.mTile.col - 1);
 		TileQ down(previousState.mTile.row - 1, previousState.mTile.col);
 
+		//wall placement
+		if (q->GetWalls() > 0)
+			new Node(this, previousState.mTile, true, previousState.mAI);
 		//create all possible moves
 		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), up))
 			new Node(this, up, false, previousState.mAI);
@@ -727,9 +747,6 @@ namespace MonteCarlo {
 		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), down))
 			new Node(this, down, false, previousState.mAI);
 
-		//wall placement
-		if(q->GetWalls() > 0)
-			new Node(this, previousState.mTile, true, previousState.mAI);
 
 		if (q->IsLegalMove(TileQ(previousState.mTile.row, previousState.mTile.col), right))
 			new Node(this, right, false, previousState.mAI);

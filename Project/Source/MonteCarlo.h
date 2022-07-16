@@ -65,6 +65,7 @@ namespace MonteCarlo {
 	struct Simulator {
 		Simulator();
 		bool Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
+		State RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>(), bool onlyWallPlacing = false);
 		TileQ PlaceWall(const TileQ& origin, bool propagation_up, float decay = 0.05f, float growing = 0.15f);
 
 		TileQ PlaceWallRandom(const TileQ& origin, QuoridorPlayer* q);
@@ -73,10 +74,8 @@ namespace MonteCarlo {
 		//void InfluenceDown(TileQ tile, float influence, int separation_value, bool last_was_separation);
 		//void InfluenceLeft(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up);
 		//void InfluenceRight(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up);
-	private:
 		int mPlayerRow, mPlayerColumn;
 		int mAIRow, mAIColumn;
 
-		State RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
 	};
 }
