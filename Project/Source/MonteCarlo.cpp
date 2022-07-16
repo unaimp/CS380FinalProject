@@ -328,6 +328,9 @@ namespace MonteCarlo {
 
 		TileQ destinationTile;
 
+		bool wall_check = false;
+		TileQ wall;
+
 		switch (posibleMoves[randomNumber]) {
 		case Moves::M_MOVE_FWD:
 			if (AITurn)
@@ -349,7 +352,6 @@ namespace MonteCarlo {
 
 			break;
 		case Moves::M_PLACE_WALL:
-			TileQ wall;
 			do {
 				std::cout << "trying to place a wall in simulation" << std::endl;
 				TileQ origin = movingQuoridor->GetTile();
@@ -359,23 +361,92 @@ namespace MonteCarlo {
 			movingQuoridor->SetWallClone(wall);
 			movingQuoridor->m_Simulation_walls--;
 			return State(currentState.mTile, AITurn, true);
+
+		case Moves::M_WALL_FWD_A:
+			wall_check = true;
+			if (AITurn)
+				destinationTile = TileQ(mPlayerRow, mPlayerColumn, true, false);
+			else
+				destinationTile = TileQ(mAIRow - 1, mAIColumn, true, false);
+
+			break;
+		case Moves::M_WALL_FWD_B:
+			wall_check = true;
+			if (AITurn)
+				destinationTile = TileQ(mPlayerRow, mPlayerColumn - 1, true, false);
+			else
+				destinationTile = TileQ(mAIRow - 1, mAIColumn - 1, true, false);
+
+			break;
+		case Moves::M_WALL_RIGHT_A:
+			wall_check = true;
+			if (AITurn)
+				destinationTile = TileQ(mPlayerRow, mPlayerColumn, false, true);
+			else
+				destinationTile = TileQ(mAIRow - 1, mAIColumn, false, true);
+
+			break;
+		case Moves::M_WALL_RIGHT_B:
+			wall_check = true;
+			if (AITurn)
+				destinationTile = TileQ(mPlayerRow - 1, mPlayerColumn, false, true);
+			else
+				destinationTile = TileQ(mAIRow, mAIColumn, false, true);
+		case Moves::M_WALL_LEFT_A:
+			wall_check = true;
+			if (AITurn)
+				destinationTile = TileQ(mPlayerRow, mPlayerColumn - 1, false, true);
+			else
+				destinationTile = TileQ(mAIRow - 1, mAIColumn - 1, false, true);
+
+			break;
+		case Moves::M_WALL_LEFT_B:
+			wall_check = true;
+			if (AITurn)
+				destinationTile = TileQ(mPlayerRow - 1, mPlayerColumn - 1, false, true);
+			else
+				destinationTile = TileQ(mAIRow, mAIColumn - 1, false, true);
+
+			break;
 		}
 
-		if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
-			return State(destinationTile, AITurn, false);
-		}
-		else {
-			//erase this possibility from the vector
-			Moves movetoDelete = posibleMoves[randomNumber];
-			for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
-				if (*it == movetoDelete) {
-					it = posibleMoves.erase(it);
-				}
-				else {
-					it++;
-				}
+		if (!wall_check)
+		{
+			if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
+				return State(destinationTile, AITurn, false);
 			}
-			return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
+			else {
+				//erase this possibility from the vector
+				Moves movetoDelete = posibleMoves[randomNumber];
+				for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
+					if (*it == movetoDelete) {
+						it = posibleMoves.erase(it);
+					}
+					else {
+						it++;
+					}
+				}
+				return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
+			}
+		}
+		else
+		{
+			if (movingQuoridor->IsLegalWall(currentState.mTile, destinationTile)) {
+				return State(destinationTile, AITurn, false);
+			}
+			else {
+				//erase this possibility from the vector
+				Moves movetoDelete = posibleMoves[randomNumber];
+				for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
+					if (*it == movetoDelete) {
+						it = posibleMoves.erase(it);
+					}
+					else {
+						it++;
+					}
+				}
+				return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
+			}
 		}
 	}
 
