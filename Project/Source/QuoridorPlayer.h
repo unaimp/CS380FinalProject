@@ -39,7 +39,8 @@ public:
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }
 
-	TileQ BiasedNextPos(const TileQ& current_tile);
+	//TileQ BiasedNextPos(const TileQ& current_tile);
+	bool PlayerHasShortestPath(const TileQ& player_tile, const TileQ& ai_tile);
 
 	// Pathfinding stuff
 	struct a_node_data

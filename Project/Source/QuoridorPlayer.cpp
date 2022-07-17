@@ -817,41 +817,62 @@ void QuoridorPlayer::Update()
 	}
 }
 
-TileQ QuoridorPlayer::BiasedNextPos(const TileQ& current_tile)
+//TileQ QuoridorPlayer::BiasedNextPos(const TileQ& current_tile)
+//{
+//	int width = g_terrain.GetWidth();
+//	int row = 0;
+//	if (m_type)
+//		row = width - 1;
+//	unsigned count = 10000;
+//	TileQ finish = current_tile;
+//	for (int col = 0; col < width; col += 3)
+//	{
+//		if (PathCheck(current_tile.row * 3, current_tile.col * 3, row, col))
+//		{
+//			if (m_waypointList.size() < count)
+//			{
+//				count = m_waypointList.size();
+//				std::list<D3DXVECTOR3>::iterator temp = m_waypointList.begin();
+//				TileQ listed;
+//				g_terrain.GetRowColumn(&(*temp), &listed.row, &listed.col);
+//				listed.row *= 3;
+//				listed.col *= 3;
+//				while (temp != m_waypointList.end() && listed.row == current_tile.row && listed.col == current_tile.col)
+//				{
+//					temp++;
+//					g_terrain.GetRowColumn(&(*temp), &listed.row, &listed.col);
+//					listed.row *= 3;
+//					listed.col *= 3;
+//				}
+//				finish = listed;
+//			}
+//		}
+//	}
+//	finish.row /= 3;
+//	finish.col /= 3;
+//
+//	return finish;
+//}
+
+bool QuoridorPlayer::PlayerHasShortestPath(const TileQ& player_tile, const TileQ& ai_tile)
 {
 	int width = g_terrain.GetWidth();
-	int row = 0;
-	if (m_type)
-		row = width - 1;
-	unsigned count = 10000;
-	TileQ finish = current_tile;
+	size_t size_player = 100000, size_ai = 100000;
 	for (int col = 0; col < width; col += 3)
 	{
-		if (PathCheck(current_tile.row * 3, current_tile.col * 3, row, col))
+		if (PathCheck(player_tile.row * 3, player_tile.col * 3, width - 1, col))
 		{
-			if (m_waypointList.size() < count)
-			{
-				count = m_waypointList.size();
-				std::list<D3DXVECTOR3>::iterator temp = m_waypointList.begin();
-				TileQ listed;
-				g_terrain.GetRowColumn(&(*temp), &listed.row, &listed.col);
-				listed.row *= 3;
-				listed.col *= 3;
-				while (temp != m_waypointList.end() && listed.row == current_tile.row && listed.col == current_tile.col)
-				{
-					temp++;
-					g_terrain.GetRowColumn(&(*temp), &listed.row, &listed.col);
-					listed.row *= 3;
-					listed.col *= 3;
-				}
-				finish = listed;
-			}
+			if (m_waypointList.size() < size_player)
+				size_player = m_waypointList.size();
+		}
+		if (PathCheck(ai_tile.row * 3, ai_tile.col * 3, 0, col))
+		{
+			if (m_waypointList.size() < size_ai)
+				size_ai = m_waypointList.size();
 		}
 	}
-	finish.row /= 3;
-	finish.col /= 3;
 
-	return finish;
+	return (size_player < size_ai);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
