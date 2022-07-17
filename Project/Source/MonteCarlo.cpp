@@ -6,8 +6,8 @@ namespace MonteCarlo {
 		mRoot(nullptr),
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
-		mUCTvar(2.f),
-		mMaximumIterations(7500),
+		mUCTvar(3.f),
+		mMaximumIterations(10000),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -23,6 +23,7 @@ namespace MonteCarlo {
 		mCurrentIterations = 0;
 
 		if (!mAIPlayer) {
+			mIntelligent1Used = false;
 			mAIPlayer = &g_database.Find("NPC")->GetQuoridor();
 			mHumanPlayer = &g_database.Find("Player")->GetQuoridor();
 		}
@@ -56,27 +57,64 @@ namespace MonteCarlo {
 
 		srand(time(nullptr));
 
-		while (mCurrentIterations < mMaximumIterations) {
-			//clone actual map
-			g_terrain.CloneMap();
+		//Some game moments where it is quicker and more intelligent to have some moves
+		//predefined
+		bool intelligentMove = false;/* IntelligentMoves();*/
 
-			mCurrentIterations++;
+		if(!intelligentMove){
+			while (mCurrentIterations < mMaximumIterations) {
+				//clone actual map
+				g_terrain.CloneMap();
 
-			//Principle of operations
-			Node* leafNode = Selection(mRoot);
-			Node* expandedNode = Expansion(leafNode);
-			bool simulationValue = Simulation(expandedNode);
-			BackPropagation(expandedNode, simulationValue);
+				mCurrentIterations++;
+
+				mHumanPlayer->m_simulation_walls = mHumanPlayer->m_walls;
+				mAIPlayer->m_simulation_walls = mAIPlayer->m_walls;
+
+				//Principle of operations
+				Node* leafNode = Selection(mRoot);
+				Node* expandedNode = Expansion(leafNode);
+				bool simulationValue = Simulation(expandedNode);
+				BackPropagation(expandedNode, simulationValue);
+			}
+
+			ActualMove();
+		}
+	}
+
+	bool MonteCarloTree::IntelligentMoves() {
+		TileQ playerTile = mHumanPlayer->GetTile();
+		TileQ aiTile = mAIPlayer->GetTile();
+
+		mStats.clear();
+		std::stringstream ss;
+
+		//AI loose condition in 2 moves, place a wall
+		if (!mIntelligent1Used && 8 - playerTile.row <= 2) {
+			if(!mAIPlayer->IsLegalMove(aiTile, TileQ(aiTile.row - 1, aiTile.col)) ||
+				!mAIPlayer->IsLegalMove(TileQ(aiTile.row - 1, aiTile.col), TileQ(aiTile.row - 2, aiTile.col))) {
+				if (mAIPlayer->GetWalls() > 0 && mHumanPlayer->IsLegalMove(playerTile, TileQ(playerTile.row + 1, playerTile.col)) &&
+					mHumanPlayer->IsLegalMove(TileQ(playerTile.row + 1, playerTile.col), TileQ(playerTile.row + 2, playerTile.col))) {
+					TileQ wall(playerTile);
+						wall.half_row = true;
+						ss << "Intelligent move\n Placing a wall in: " << wall.row << ", " << wall.col << std::endl;
+						mAIPlayer->SetWall(wall);
+						mAIPlayer->m_walls--;
+						mIntelligent1Used = true;
+						mStats = ss.str();
+						return true;
+				}
+			}
 		}
 
-		ActualMove();
+
+
+		return false;
 	}
 
 	void MonteCarloTree::ActualMove() {
 		int higherValue = -10000;
 		Node* betterOption = nullptr;
-
-		std::cout << std::endl << std::endl;
 
 		mStats.clear();
 		std::stringstream ss;
@@ -97,7 +135,6 @@ namespace MonteCarlo {
 				betterOption = it;
 			}
 		}
-
 
 		//actual move
 		if (betterOption->mState->mWallPlacement) {
@@ -121,7 +158,6 @@ namespace MonteCarlo {
 
 		mStats = ss.str();
 
-		
 		//erase the created tree
 		End();
 	}
@@ -157,6 +193,14 @@ namespace MonteCarlo {
 				}
 			}
 
+			//set walls in the map if this node is wall placement
+			if (currentNode->mState->mWallPlacement) {
+				if (currentNode->mAI)
+					mAIPlayer->SetWallClone(currentNode->mState->mWall);
+				else
+					mHumanPlayer->SetWallClone(currentNode->mState->mWall);
+			}
+
 			//move onel level downwards in the tree by selecting the child with better UCT value
 			currentNode = betterOption;
 		}
@@ -168,8 +212,8 @@ namespace MonteCarlo {
 	/*create one (or more) child nodes and choose node C from one of them. Child nodes are any valid moves 
 	from the game position defined by L.*/
 	MonteCarloTree::Node* MonteCarloTree::Expansion(Node* leafNode) {
-		//if the leaf node has not been visited yet
-		if (leafNode->mVisitedTimes == 0) {
+		//if the leaf node has not been visited yet or it is a terminal state
+		if (leafNode->mVisitedTimes == 0 || leafNode->mState->IsTerminal()) {
 			//rollout from this node
 			return leafNode;
 		}
@@ -199,8 +243,8 @@ namespace MonteCarlo {
 		}
 		else {
 			playerTile = node->mState->mTile;
-				if (node->mParent)
-					aiTile = node->mParent->mState->mTile;
+			if (node->mParent)
+				aiTile = node->mParent->mState->mTile;
 			else
 				aiTile = mAIPlayer->GetTile();
 		}
@@ -212,13 +256,15 @@ namespace MonteCarlo {
 		if (node->mState->mWallPlacement) {
 			if (node->mAI) {
 				mAIPlayer->SetWallClone(node->mState->mWall);
+				mAIPlayer->m_simulation_walls--;
 			}
 			else {
 				mHumanPlayer->SetWallClone(node->mState->mWall);
+				mHumanPlayer->m_simulation_walls--;
 			}
 		}
 
-		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, node->mAI);
+		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, !node->mAI);
 
 		//stats
 		if (simValue)
@@ -251,7 +297,6 @@ namespace MonteCarlo {
 		State AIState = State(AITile, true, false);
 		State playerState = State(playerTile, false, false);
 
-		
 		//During simulation the moves are chosen with respect to a function called rollout policy function (which has some biased stats)
 		while (1) {
 			if (AIStarts) {
@@ -301,14 +346,12 @@ namespace MonteCarlo {
 			
 		}
 
+		srand(time(nullptr));
 		//randomizer for next move
 		int randomNumber = rand() % posibleMoves.size();
 
 
 		TileQ destinationTile;
-
-		bool wall_check = false;
-		TileQ wall;
 
 		switch (posibleMoves[randomNumber]) {
 		case Moves::M_MOVE_FWD:
@@ -584,7 +627,7 @@ namespace MonteCarlo {
 	}
 
 	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI, TileQ wall) : mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(AI),
-	mState(new State(tile, mAI, wallPlacement, wall)){
+	mState(new State(tile, AI, wallPlacement, wall)){
 		//add parent as parent pointer
 		mParent = parent;
 
@@ -624,12 +667,13 @@ namespace MonteCarlo {
 		TileQ left(previousTile.row, previousTile.col - 1);
 		TileQ down(previousTile.row - 1, previousTile.col);
 
-		//create all possible moves
-		if (q->IsLegalMove(previousTile, up))
-			new Node(this, up, false, !this->mAI);
 		//
 		if (q->IsLegalMove(previousTile, down))
 			new Node(this, down, false, !this->mAI);
+
+		//create all possible moves
+		if (q->IsLegalMove(previousTile, up))
+			new Node(this, up, false, !this->mAI);
 
 		if (q->IsLegalMove(previousTile, right))
 			new Node(this, right, false, !this->mAI);

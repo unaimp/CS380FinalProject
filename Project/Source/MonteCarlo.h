@@ -33,6 +33,8 @@ namespace MonteCarlo {
 		std::string GetStats() { return mStats; }
 
 	private:
+		bool IntelligentMoves();
+		bool mIntelligent1Used;
 		void Eraser(Node* n);
 		//Principle of operation
 		Node* Selection(Node* currentNode);

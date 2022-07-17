@@ -67,6 +67,7 @@ public:
 
 	TileQ m_tile;
 	unsigned m_walls;
+	unsigned m_simulation_walls;
 private:
 	bool m_type;
 
