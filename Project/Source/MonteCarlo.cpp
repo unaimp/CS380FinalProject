@@ -125,31 +125,31 @@ namespace MonteCarlo {
 
 					switch (mAIPlayer->GetWalls()) {
 						case 1:
-							if (diff < 0.5f) {
+							if (diff < 0.4f) {
 								higherValue = it->mTotalSimulationReward;
 								betterOption = it;
 							}
 							break;
 						case 2: 
-							if (diff < 0.6f) {
+							if (diff < 0.5f) {
 								higherValue = it->mTotalSimulationReward;
 								betterOption = it;
 							}
 							break;
 						case 3:
-							if (diff < 0.65f) {
+							if (diff < 0.55f) {
 								higherValue = it->mTotalSimulationReward;
 								betterOption = it;
 							}
 							break;
 						case 4:
-							if (diff < 0.8f) {
+							if (diff < 0.7f) {
 								higherValue = it->mTotalSimulationReward;
 								betterOption = it;
 								}
 							break;
 						case 5:
-							if (diff < 0.9f) {
+							if (diff < 0.8f) {
 								higherValue = it->mTotalSimulationReward;
 								betterOption = it;
 							}
