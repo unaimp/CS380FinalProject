@@ -20,12 +20,10 @@ namespace MonteCarlo {
 
 	void MonteCarloTree::Start(void) {
 		mMaximumIterations = 10000;
-		mMaximumWallChildren = 6;
 
 		mCurrentIterations = 0;
 
 		if (!mAIPlayer) {
-			mIntelligent1Used = false;
 			mAIPlayer = &g_database.Find("NPC")->GetQuoridor();
 			mHumanPlayer = &g_database.Find("Player")->GetQuoridor();
 		}
@@ -144,6 +142,18 @@ namespace MonteCarlo {
 			Node* betterOption = nullptr;
 			//Use UCT formula to determine where to explore the tree from
 			for (auto& it : currentNode->mChildren) {
+				//set walls in the map if this node is wall placement
+				if (currentNode->mState->mWallPlacement) {
+					if (currentNode->mAI) {
+						mAIPlayer->SetWallClone(currentNode->mState->mWall);
+						mAIPlayer->m_simulation_walls--;
+					}
+					else {
+						mHumanPlayer->SetWallClone(currentNode->mState->mWall);
+						mHumanPlayer->m_simulation_walls--;
+					}
+				}
+
 				//if never visited UCT calculation will be +inf
 				if (it->mVisitedTimes == 0) {
 					betterOption = it;
@@ -163,14 +173,6 @@ namespace MonteCarlo {
 					bestUCT = uct_value;
 					betterOption = it;
 				}
-			}
-
-			//set walls in the map if this node is wall placement
-			if (currentNode->mState->mWallPlacement) {
-				if (currentNode->mAI)
-					mAIPlayer->SetWallClone(currentNode->mState->mWall);
-				else
-					mHumanPlayer->SetWallClone(currentNode->mState->mWall);
 			}
 
 			//move onel level downwards in the tree by selecting the child with better UCT value
@@ -304,20 +306,9 @@ namespace MonteCarlo {
 
 		//moves are not created yet
 		if (posibleMoves.empty()) {
-			//BIASED ACTIONS, highly expected to movem forward if possible
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
-			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			//BIASED ACTIONS, highly expected to move forward if possible
+			for(int i = 0; i < 20; i++)
+				posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_LEFT);
@@ -449,7 +440,6 @@ namespace MonteCarlo {
 
 		//create all wall placement
 		if (q->GetWalls() > 0) {
-			int maximumWallMoves = mMaximumWallChildren;
 			if (this->mAI) {
 				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, true, false))) {
 				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, true, false));
@@ -481,11 +471,11 @@ namespace MonteCarlo {
 				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))) {
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
 				}
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
-				}
-				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
+				//if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
+				//}
+				//else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 			}
 		}
 	}

@@ -1,7 +1,184 @@
-﻿  terrain.cpp
+﻿  Stdafx.cpp
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.h(3,12): warning C4099: 'TileQ': nombre de tipo visto anteriormente usando 'struct' ahora se ve usando 'class'
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.h(3): message : vea la declaración de 'TileQ'
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\gameobject.h(33,12): warning C4099: 'TileQ': nombre de tipo visto anteriormente usando 'struct' ahora se ve usando 'class'
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.h(3): message : vea la declaración de 'TileQ'
+  Action.cpp
+  Blackboard.cpp
+  body.cpp
+  Clock.cpp
+  Enemy.cpp
+  Enemy_student.cpp
+  gameobject.cpp
+  MonteCarlo.cpp
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(58,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(170,21): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(320,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(369,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(392,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(385): message : al compilar la función del miembro clase plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(float)"
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(121): message : Vea la referencia a la creación de una instancia de la función plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(float)" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\istream(708): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ostream<char,std::char_traits<char>>" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\sstream(786): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_iostream<char,std::char_traits<char>>" que se está compilando
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(85): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_stringstream<char,std::char_traits<char>,std::allocator<char>>" que se está compilando
+  movement.cpp
+  agent.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(410,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(403): message : al compilar la función del miembro clase plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(double)"
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\agent.cpp(435): message : Vea la referencia a la creación de una instancia de la función plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(double)" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\fstream(989): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ostream<char,std::char_traits<char>>" que se está compilando
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\agent.cpp(433): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ofstream<char,std::char_traits<char>>" que se está compilando
+  movement_student.cpp
+  PathfindingTests.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(410,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(403): message : al compilar la función del miembro clase plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(double)"
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\PathfindingTests.cpp(371): message : Vea la referencia a la creación de una instancia de la función plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(double)" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\fstream(989): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ostream<char,std::char_traits<char>>" que se está compilando
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\PathfindingTests.cpp(192): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ofstream<char,std::char_traits<char>>" que se está compilando
+  QuoridorPlayer.cpp
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(255,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(305,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(355,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(405,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(854,29): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(775,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "int *std::vector<int,std::allocator<int>>::_Emplace_reallocate<_Ty>(int *const ,_Ty &&)" que se está compilando
+          with
+          [
+              _Ty=int
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "int *std::vector<int,std::allocator<int>>::_Emplace_reallocate<_Ty>(int *const ,_Ty &&)" que se está compilando
+          with
+          [
+              _Ty=int
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(748): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<int,std::allocator<int>>::emplace_back<int>(int &&)" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(746): message : al compilar la función del miembro clase plantilla "void std::vector<int,std::allocator<int>>::push_back(_Ty &&)"
+          with
+          [
+              _Ty=int
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(1039): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<int,std::allocator<int>>::push_back(_Ty &&)" que se está compilando
+          with
+          [
+              _Ty=int
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\QuoridorPlayer.h(78): message : Vea la referencia a la creación de una instancia de clase plantilla "std::vector<int,std::allocator<int>>" que se está compilando
+  Random.cpp
+  AllocHierarchy.cpp
+  AnimationInstance.cpp
+  terrain_student.cpp
+  Tiny.cpp
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\Tiny.cpp(183,2): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+  DXUT.cpp
+  DXUTcamera.cpp
+  Compilando...
+  DXUTenum.cpp
+  DXUTgui.cpp
+  DXUTmisc.cpp
+  DXUTres.cpp
+  DXUTsettingsdlg.cpp
+  SDKmisc.cpp
+  SDKsound.cpp
+  SDKwavefile.cpp
+  database.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(775,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "GameObject **std::vector<GameObject *,std::allocator<GameObject *>>::_Emplace_reallocate<const _Ty&>(GameObject **const ,const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=GameObject *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "GameObject **std::vector<GameObject *,std::allocator<GameObject *>>::_Emplace_reallocate<const _Ty&>(GameObject **const ,const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=GameObject *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(743): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<GameObject *,std::allocator<GameObject *>>::emplace_back<const _Ty&>(const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=GameObject *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(742): message : al compilar la función del miembro clase plantilla "void std::vector<GameObject *,std::allocator<GameObject *>>::push_back(const _Ty &)"
+          with
+          [
+              _Ty=GameObject *
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\database.cpp(297): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<GameObject *,std::allocator<GameObject *>>::push_back(const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=GameObject *
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\database.cpp(297): message : Vea la referencia a la creación de una instancia de clase plantilla "std::vector<GameObject *,std::allocator<GameObject *>>" que se está compilando
+  debugdrawing.cpp
+  Map.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(283,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(268): message : al compilar la función del miembro clase plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(int)"
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\Map.cpp(136): message : Vea la referencia a la creación de una instancia de la función plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(int)" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\fstream(989): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ostream<char,std::char_traits<char>>" que se está compilando
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\Map.cpp(125): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ofstream<char,std::char_traits<char>>" que se está compilando
+  terrain.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(775,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "Map *std::vector<Map,std::allocator<Map>>::_Emplace_reallocate<_Ty>(Map *const ,_Ty &&)" que se está compilando
+          with
+          [
+              _Ty=Map
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "Map *std::vector<Map,std::allocator<Map>>::_Emplace_reallocate<_Ty>(Map *const ,_Ty &&)" que se está compilando
+          with
+          [
+              _Ty=Map
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(748): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<Map,std::allocator<Map>>::emplace_back<Map>(Map &&)" que se está compilando
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(746): message : al compilar la función del miembro clase plantilla "void std::vector<Map,std::allocator<Map>>::push_back(_Ty &&)"
+          with
+          [
+              _Ty=Map
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\terrain.cpp(40): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<Map,std::allocator<Map>>::push_back(_Ty &&)" que se está compilando
+          with
+          [
+              _Ty=Map
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\terrain.h(101): message : Vea la referencia a la creación de una instancia de clase plantilla "std::vector<Map,std::allocator<Map>>" que se está compilando
+  world.cpp
+  debuglog.cpp
+  msg.cpp
+  msgroute.cpp
+  statemch.cpp
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(775,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "StateMachinePersistentData **std::vector<StateMachinePersistentData *,std::allocator<StateMachinePersistentData *>>::_Emplace_reallocate<const _Ty&>(StateMachinePersistentData **const ,const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=StateMachinePersistentData *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(734): message : Vea la referencia a la creación de una instancia de la función plantilla "StateMachinePersistentData **std::vector<StateMachinePersistentData *,std::allocator<StateMachinePersistentData *>>::_Emplace_reallocate<const _Ty&>(StateMachinePersistentData **const ,const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=StateMachinePersistentData *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(743): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<StateMachinePersistentData *,std::allocator<StateMachinePersistentData *>>::emplace_back<const _Ty&>(const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=StateMachinePersistentData *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(742): message : al compilar la función del miembro clase plantilla "void std::vector<StateMachinePersistentData *,std::allocator<StateMachinePersistentData *>>::push_back(const _Ty &)"
+          with
+          [
+              _Ty=StateMachinePersistentData *
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\statemch.cpp(1216): message : Vea la referencia a la creación de una instancia de la función plantilla "void std::vector<StateMachinePersistentData *,std::allocator<StateMachinePersistentData *>>::push_back(const _Ty &)" que se está compilando
+          with
+          [
+              _Ty=StateMachinePersistentData *
+          ]
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\statemch.h(461): message : Vea la referencia a la creación de una instancia de clase plantilla "std::vector<StateMachinePersistentData *,std::allocator<StateMachinePersistentData *>>" que se está compilando
+  triggersystem.cpp
+  MultiAnimation.cpp
+  MultiAnimationLib.cpp
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MultiAnimationLib.cpp(478,5): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
+LINK : warning LNK4075: se omite '/INCREMENTAL' debido a la especificación '/LTCG'
   Generando código
-  1 of 3267 functions (<0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    21 functions had inline decision re-evaluated but remain unchanged
+  Previous IPDB not found, fall back to full compilation.
+  All 3269 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Generación de código finalizada
-  MCTSQuoridorProject.vcxproj -> C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Release\MCTSQuoridorProject.exe
+  MCTSQuoridorProject.vcxproj -> C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Release\MCTSQuoridorProject.exe

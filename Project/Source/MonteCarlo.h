@@ -6,7 +6,6 @@ namespace MonteCarlo {
 	struct Simulator; //fwd declaration
 
 	static int mMaximumIterations;
-	static int mMaximumWallChildren;
 
 	class MonteCarloTree {
 	public:
@@ -36,8 +35,6 @@ namespace MonteCarlo {
 		std::string GetStats() { return mStats; }
 
 	private:
-		bool IntelligentMoves();
-		bool mIntelligent1Used;
 		void Eraser(Node* n);
 		//Principle of operation
 		Node* Selection(Node* currentNode);
@@ -70,7 +67,6 @@ namespace MonteCarlo {
 		Simulator();
 		bool Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
 		State RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
-		TileQ PlaceWall(const TileQ& origin, bool propagation_up, float decay = 0.05f, float growing = 0.15f);
 
 		TileQ PlaceWallRandom(const TileQ& origin, QuoridorPlayer* q);
 
