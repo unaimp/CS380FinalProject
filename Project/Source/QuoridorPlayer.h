@@ -39,6 +39,8 @@ public:
 	TileQ GetTile() { return m_tile; }
 	unsigned GetWalls() { return m_walls; }
 
+	TileQ BiasedNextPos(const TileQ& current_tile);
+
 	// Pathfinding stuff
 	struct a_node_data
 	{
