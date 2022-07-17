@@ -1,7 +1,7 @@
 
 #include <Stdafx.h>
 
-QuoridorPlayer::QuoridorPlayer(bool type, TileQ tile) : m_type(type), m_walls(5)
+QuoridorPlayer::QuoridorPlayer(bool type, TileQ tile) : m_type(type), m_walls(10)
 {
 	m_tile.row = tile.row;
 	m_tile.col = tile.col;

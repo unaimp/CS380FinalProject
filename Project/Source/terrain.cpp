@@ -145,8 +145,8 @@ void Terrain::ResetMap(void)
 	GameObject* npc = g_database.Find("NPC");
 	if (player != nullptr)
 	{
-		player->GetQuoridor().SetWallCount(5);
-		npc->GetQuoridor().SetWallCount(5);
+		player->GetQuoridor().SetWallCount(10);
+		npc->GetQuoridor().SetWallCount(10);
 		if (m_nextMap == 0)
 		{
 			player->GetQuoridor().SetPlayerInTile(0, 4);

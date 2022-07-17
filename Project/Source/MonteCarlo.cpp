@@ -24,19 +24,19 @@ namespace MonteCarlo {
 		//set ai difficulty
 		switch (mAIDificulty.mLevel) {
 		case L_EASY:
-			mAIDificulty.mMaximumIterations = 750;
-			mAIDificulty.mMaximumTime = 2.f;
-			mAIDificulty.mMaximumTimeInSimulation = 0.5f;
+			mAIDificulty.mMaximumIterations = 500;
+			mAIDificulty.mMaximumTime = 3.f;
+			mAIDificulty.mMaximumTimeInSimulation = 1.3f;
 		break;
 		case L_MID:
-			mAIDificulty.mMaximumIterations = 5000;
-			mAIDificulty.mMaximumTime = 4.f;
-			mAIDificulty.mMaximumTimeInSimulation = 0.75f;
+			mAIDificulty.mMaximumIterations = 2000;
+			mAIDificulty.mMaximumTime = 6.f;
+			mAIDificulty.mMaximumTimeInSimulation = 3.f;
 			break;
 		case L_HARD:
-			mAIDificulty.mMaximumIterations = 15000;
-			mAIDificulty.mMaximumTime = 9.f;
-			mAIDificulty.mMaximumTimeInSimulation = 1.5f;
+			mAIDificulty.mMaximumIterations = 10000;
+			mAIDificulty.mMaximumTime = 12.f;
+			mAIDificulty.mMaximumTimeInSimulation = 4.5f;
 			break;
 		}
 
@@ -116,49 +116,8 @@ namespace MonteCarlo {
 				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward  << std::endl;
 
 			if (it->mTotalSimulationReward > higherValue) {
-				//if this is mode hard add small logic of wall placement
-				if (mAIDificulty.mLevel == Level::L_HARD && betterOption && betterOption->mState->mWallPlacement == false && it->mState->mWallPlacement) {
-					float wall_winRate = static_cast<float>(it->mTotalSimulationReward) / it->mVisitedTimes;
-					float prev_winRate = static_cast<float>(betterOption->mTotalSimulationReward) / betterOption->mVisitedTimes;
-					float diff = prev_winRate / wall_winRate;
-
-					switch (mAIPlayer->GetWalls()) {
-						case 1:
-							if (diff < 0.4f) {
-								higherValue = it->mTotalSimulationReward;
-								betterOption = it;
-							}
-							break;
-						case 2: 
-							if (diff < 0.5f) {
-								higherValue = it->mTotalSimulationReward;
-								betterOption = it;
-							}
-							break;
-						case 3:
-							if (diff < 0.55f) {
-								higherValue = it->mTotalSimulationReward;
-								betterOption = it;
-							}
-							break;
-						case 4:
-							if (diff < 0.7f) {
-								higherValue = it->mTotalSimulationReward;
-								betterOption = it;
-								}
-							break;
-						case 5:
-							if (diff < 0.8f) {
-								higherValue = it->mTotalSimulationReward;
-								betterOption = it;
-							}
-							break;
-						}
-				}
-				else {
-					higherValue = it->mTotalSimulationReward;
-					betterOption = it;
-				}
+				higherValue = it->mTotalSimulationReward;
+				betterOption = it;
 			}
 		}
 
@@ -312,9 +271,11 @@ namespace MonteCarlo {
 		
 		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, !node->mAI, mSimFAIL);
 
-		//timeout in simulation
-		if (mSimFAIL == true)
+		//timeout in simulation, get simulation value by doing pathfinding
+		if (mSimFAIL == true) {
 			simValue =  !mAIPlayer->PlayerHasShortestPath(playerTile, aiTile, !node->mAI);
+			std::cout << "Pathfinding: " << simValue << std::endl;
+		}
 
 		//stats
 		if (simValue)
@@ -538,7 +499,7 @@ namespace MonteCarlo {
 		}
 		if (q->GetWalls() > 0) {
 			if (!this->mAI) {
-				if (mAIDificulty.mLevel == Level::L_HARD) {
+				if (mAIDificulty.mLevel == Level::L_HARD || mAIDificulty.mLevel == Level::L_MID) {
 					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))) {
 						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
 					}
