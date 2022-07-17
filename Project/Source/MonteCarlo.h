@@ -5,6 +5,9 @@ class TileQ;
 namespace MonteCarlo {
 	struct Simulator; //fwd declaration
 
+	static int mMaximumIterations;
+	static int mMaximumWallChildren;
+
 	class MonteCarloTree {
 	public:
 		struct Node {
@@ -21,7 +24,7 @@ namespace MonteCarlo {
 			bool mAI;
 			//data
 			unsigned int mVisitedTimes;
-			float mTotalSimulationReward;
+			int mTotalSimulationReward;
 		};
 		MonteCarloTree(void);
 		~MonteCarloTree(void);
@@ -52,7 +55,6 @@ namespace MonteCarlo {
 
 		float mUCTvar;
 
-		int mMaximumIterations;
 		int mCurrentIterations;
 		int mMinimumVisitedTimes;
 

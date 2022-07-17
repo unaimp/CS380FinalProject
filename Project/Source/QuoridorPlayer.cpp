@@ -267,7 +267,7 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ& tile)
 	if (origin_tile.col != width)
 	{
 		if (origin_tile.row == tile.row && origin_tile.col+1 == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row, bottom_left_tile.col-1))
+			!g_terrain.IsWallClone(bottom_left_tile.row, bottom_left_tile.col-1))
 		{
 			if (!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
 			{
@@ -317,7 +317,7 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ& tile)
 	if (origin_tile.row != 0)
 	{
 		if (origin_tile.row-1 == tile.row && origin_tile.col == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row+2, bottom_left_tile.col))
+			!g_terrain.IsWallClone(bottom_left_tile.row+2, bottom_left_tile.col))
 		{
 			if (!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
 			{
@@ -367,7 +367,7 @@ bool QuoridorPlayer::IsLegalMove(TileQ origin_tile, TileQ& tile)
 	if (origin_tile.row != width)
 	{
 		if (origin_tile.row+1 == tile.row && origin_tile.col == tile.col &&
-			!g_terrain.IsWall(bottom_left_tile.row-1, bottom_left_tile.col))
+			!g_terrain.IsWallClone(bottom_left_tile.row-1, bottom_left_tile.col))
 		{
 			if (!g_terrain.IsBlank(bottom_left_tile.row, bottom_left_tile.col))
 			{
@@ -958,7 +958,7 @@ bool QuoridorPlayer::WallCheck(int or , int oc, int r, int c)
 bool QuoridorPlayer::WallCheck2(int or , int oc, int r, int c)
 {
 	// If it's a wall already, return true
-	if (g_terrain.IsWall(or , oc))
+	if (g_terrain.IsWallClone(or , oc))
 		return true;
 	// If it's a diagonal
 	if (IsDiagonal(or , oc, r, c))

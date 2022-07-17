@@ -1,12 +1,60 @@
-﻿  MonteCarlo.cpp
-C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(58,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(134,21): warning C4244: '=': conversión de 'float' a 'int'; posible pérdida de datos
-C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(187,21): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(350,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(610,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+﻿  Stdafx.cpp
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.h(3,12): warning C4099: 'TileQ': nombre de tipo visto anteriormente usando 'struct' ahora se ve usando 'class'
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\QuoridorPlayer.h(3): message : vea la declaración de 'TileQ'
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\gameobject.h(33,12): warning C4099: 'TileQ': nombre de tipo visto anteriormente usando 'struct' ahora se ve usando 'class'
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.h(3): message : vea la declaración de 'TileQ'
+  Action.cpp
+  Blackboard.cpp
+  body.cpp
+  Clock.cpp
+  Enemy.cpp
+  Enemy_student.cpp
+  gameobject.cpp
+  MonteCarlo.cpp
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(60,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(195,21): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(364,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\MonteCarlo.cpp(415,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+  movement.cpp
+  agent.cpp
+  movement_student.cpp
+  PathfindingTests.cpp
+  QuoridorPlayer.cpp
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(255,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(305,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(355,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(405,17): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Source\QuoridorPlayer.cpp(854,29): warning C4244: 'argumento': conversión de 'int' a 'float'; posible pérdida de datos
+  Random.cpp
+  AllocHierarchy.cpp
+  AnimationInstance.cpp
+  terrain_student.cpp
+  Tiny.cpp
+  DXUT.cpp
+  DXUTcamera.cpp
+  Compilando...
+  DXUTenum.cpp
+  DXUTgui.cpp
+  DXUTmisc.cpp
+  DXUTres.cpp
+  DXUTsettingsdlg.cpp
+  SDKmisc.cpp
+  SDKsound.cpp
+  SDKwavefile.cpp
+  database.cpp
+  debugdrawing.cpp
+  Map.cpp
+  terrain.cpp
+  world.cpp
+  debuglog.cpp
+  msg.cpp
+  msgroute.cpp
+  statemch.cpp
+  triggersystem.cpp
+  MultiAnimation.cpp
+  MultiAnimationLib.cpp
   Generando código
-  7 of 3268 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    36 functions had inline decision re-evaluated but remain unchanged
+  Previous IPDB not found, fall back to full compilation.
+  All 3267 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Generación de código finalizada
   MCTSQuoridorProject.vcxproj -> C:\Users\Unai Morentin\Desktop\DigiPen\GAM300-350\CS380FinalProject\Project\Release\MCTSQuoridorProject.exe

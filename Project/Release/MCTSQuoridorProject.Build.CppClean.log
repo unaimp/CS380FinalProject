@@ -1,8 +1,10 @@
-c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\mctsquoridorproject.pch
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\vc142.pdb
-c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\stdafx.obj
-c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\multianimation.obj
+c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\quoridorplayer.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\montecarlo.obj
+c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\multianimation.obj
+c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\action.obj
+c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\mctsquoridorproject.pch
+c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\stdafx.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\map.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\enemy_student.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\enemy.obj
@@ -20,7 +22,6 @@ c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\rele
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\blackboard.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\animationinstance.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\allochierarchy.obj
-c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\action.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\world.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\triggersystem.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\terrain_student.obj
@@ -38,7 +39,6 @@ c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\rele
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\agent.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\tiny.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\random.obj
-c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\quoridorplayer.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\pathfindingtests.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\multianimationlib.obj
 c:\users\unai morentin\desktop\digipen\gam300-350\cs380finalproject\project\release\mctsquoridorproject.exe

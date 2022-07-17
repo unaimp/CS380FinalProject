@@ -6,8 +6,7 @@ namespace MonteCarlo {
 		mRoot(nullptr),
 		mCurrentIterations(0),
 		mMinimumVisitedTimes(1),
-		mUCTvar(3.f),
-		mMaximumIterations(10000),
+		mUCTvar(2.f),
 		mSimulator(nullptr),
 		mAIPlayer(nullptr)
 	{
@@ -20,6 +19,9 @@ namespace MonteCarlo {
 
 
 	void MonteCarloTree::Start(void) {
+		mMaximumIterations = 1000;
+		mMaximumWallChildren = 6;
+
 		mCurrentIterations = 0;
 
 		if (!mAIPlayer) {
@@ -183,9 +185,14 @@ namespace MonteCarlo {
 					break;
 				}
 
+				//compute the winrate of the node
+				float winRate = static_cast<float>(it->mTotalSimulationReward) / it->mVisitedTimes;
+				//if this is the player move this will be our loserate
+				if (!it->mAI)
+					winRate = 1.f - winRate; 
+
 				// balance between expansion and exploration
-				float uct_value = it->mTotalSimulationReward / it->mVisitedTimes + 
-					mUCTvar * sqrt(log(currentNode->mVisitedTimes) / it->mVisitedTimes);
+				float uct_value = winRate + mUCTvar * sqrt(log(currentNode->mVisitedTimes) / it->mVisitedTimes);
 
 				if (uct_value > bestUCT) {
 					bestUCT = uct_value;
@@ -280,7 +287,7 @@ namespace MonteCarlo {
 		if (node == nullptr)		return; //root node
 
 		//update values
-		if(aiWon)
+		if(aiWon /*&& node->mAI	||		!aiWon && !node->mAI*/)
 			node->mTotalSimulationReward++;
 
 		node->mVisitedTimes++;
@@ -332,7 +339,15 @@ namespace MonteCarlo {
 
 		//moves are not created yet
 		if (posibleMoves.empty()) {
-			//BIASED ACTIONS
+			//BIASED ACTIONS, highly expected to movem forward if possible
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
+			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_FWD);
@@ -375,9 +390,11 @@ namespace MonteCarlo {
 		}
 
 		if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
+			std::cout << "CORRECT ";
 			return State(destinationTile, AITurn, false);
 		}
 		else {
+			std::cout << "illegal " << posibleMoves[randomNumber] <<std::endl;
 			//erase this possibility from the vector
 			Moves movetoDelete = posibleMoves[randomNumber];
 			for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
@@ -391,217 +408,6 @@ namespace MonteCarlo {
 			return RollOut(currentState, movingQuoridor, otherPlayer, AITurn, posibleMoves);
 		}
 		
-	}
-
-	/*void Simulator::InfluenceUp(TileQ tile, float influence, int separation_value, bool last_was_separation)
-	{
-		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
-		if (row+2 == g_terrain.GetWidth() && influence <= 0.f)
-			return;
-
-		if (!g_terrain.IsWallClone(row + 2, col))
-		{
-			g_terrain.SetInfluenceCloneMapValue(row + 2, col + 0, influence);
-			g_terrain.SetInfluenceCloneMapValue(row + 2, col + 1, influence);
-			
-			//InfluenceUp(TileQ(tile.row+1, tile.col), influence - 0.1f, separation_value, false);
-		}
-		else if (separation_value != 0 && !last_was_separation)
-		{
-			InfluenceLeft(TileQ(tile.row, tile.col), influence, separation_value - 1, true, true);
-			InfluenceRight(TileQ(tile.row, tile.col), influence, separation_value - 1, true, true);
-		}
-	}
-
-	void Simulator::InfluenceDown(TileQ tile, float influence, int separation_value, bool last_was_separation)
-	{
-		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
-		if (row == 0 && influence <= 0.f)
-			return;
-
-		if (!g_terrain.IsWallClone(row - 1, col))
-		{
-			g_terrain.SetInfluenceCloneMapValue(row - 1, col + 0, influence);
-			g_terrain.SetInfluenceCloneMapValue(row - 1, col + 1, influence);
-
-			InfluenceDown(TileQ(tile.row - 1, tile.col), influence - 0.1f, separation_value, false);
-		}
-		else if (separation_value != 0 && !last_was_separation)
-		{
-			InfluenceLeft(TileQ(tile.row, tile.col), influence, separation_value - 1, true, false);
-			InfluenceRight(TileQ(tile.row, tile.col), influence, separation_value - 1, true, false);
-		}
-	}
-
-	void Simulator::InfluenceLeft(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up)
-	{
-		if (influence <= 0.f)
-			return;
-
-		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
-
-		if (col != 0 && !g_terrain.IsWallClone(row, col - 1))
-		{
-			g_terrain.SetInfluenceCloneMapValue(row + 0, col - 1, influence);
-			g_terrain.SetInfluenceCloneMapValue(row + 1, col - 1, influence);
-
-			InfluenceLeft(TileQ(tile.row, tile.col - 1), influence - 0.1f, separation_value, false, go_up);
-		}
-		else if (separation_value != 0 && !last_was_separation)
-		{
-			if (go_up)
-				InfluenceUp(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
-			else
-				InfluenceDown(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
-		}
-	}
-
-	void Simulator::InfluenceRight(TileQ tile, float influence, int separation_value, bool last_was_separation, bool go_up)
-	{
-		if (influence <= 0.f)
-			return;
-
-		int row = tile.row * 3, col = tile.col * 3, width = g_terrain.GetWidth();
-
-		if (col != 0 && !g_terrain.IsWallClone(row, col + 2))
-		{
-			g_terrain.SetInfluenceCloneMapValue(row + 0, col + 2, influence);
-			g_terrain.SetInfluenceCloneMapValue(row + 1, col + 2, influence);
-
-			InfluenceRight(TileQ(tile.row, tile.col + 1), influence - 0.1f, separation_value, false, go_up);
-		}
-		else if (separation_value != 0 && !last_was_separation)
-		{
-			if (go_up)
-				InfluenceUp(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
-			else
-				InfluenceDown(TileQ(tile.row, tile.col), influence, separation_value - 1, true);
-		}
-	}*/
-
-	//Places a wall using propagation logic
-	TileQ Simulator::PlaceWall(const TileQ& origin, bool propagation_up, float decay, float growing)
-	{
-		int width = g_terrain.GetWidth();
-
-		QuoridorPlayer quoridor(g_database.Find("NPC")->GetQuoridor());
-
-		if (!propagation_up)
-			quoridor = g_database.Find("Player")->GetQuoridor();
-
-		int row = origin.row * 3, col = origin.col * 3;
-
-		if (propagation_up)
-		{
-			// Trying up wall
-			if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col, true, false)))
-				return TileQ(origin.row, origin.col, true, false);
-			if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col-1, true, false)))
-				return TileQ(origin.row, origin.col - 1, true, false);
-		}
-		else
-		{
-			// Trying down wall
-			if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col, true, false)))
-				return TileQ(origin.row - 1, origin.col, true, false);
-			if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col-1, true, false)))
-				return TileQ(origin.row - 1, origin.col - 1, true, false);
-		}
-
-		// Trying left wall
-		if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col-1, false, true)))
-			return TileQ(origin.row, origin.col - 1, false, true);
-		if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col-1, false, true)))
-			return TileQ(origin.row - 1, origin.col - 1, false, true);
-
-		// Trying right wall
-		if (quoridor.IsLegalWall(origin, TileQ(origin.row, origin.col, false, true)))
-			return TileQ(origin.row, origin.col, false, true);
-		if (quoridor.IsLegalWall(origin, TileQ(origin.row-1, origin.col, false, true)))
-			return TileQ(origin.row - 1, origin.col, false, true);
-
-		// THIS IS A NON VALID WALL PLACEMENT
-		return TileQ();
-
-		//std::vector<float> m_terrainTempMap; // row * with + col
-		//m_terrainTempMap.resize(width * width);
-
-		//if (propagation_up)
-		//	InfluenceUp(origin, 1.f, 0, false);
-		//else
-		//	InfluenceDown(origin, 1.f, 0, false);
-
-		//// Setting the influence values into the map
-		//for (int row = 0; row < width; row++)
-		//{
-		//	for (int col = 0; col < width; col++)
-		//	{
-		//		g_terrain.SetInfluenceCloneMapValue(row, col, m_terrainTempMap[row * width + col]);
-		//	}
-		//}
-
-		/*float max_influence = 0.f;
-		TileQ wall_tile;
-
-		// Setting the influence values into the map
-		for (int row = 0; row < width; row++)
-		{
-			for (int col = 0; col < width; col++)
-			{
-				float influence = g_terrain.GetCloneMap().GetInfluence(row, col);
-				if (influence != 0.f && influence != 1.f)
-				{
-					if (influence > max_influence)
-					{
-						TileQ quoridor_tile(row / 3, col / 3);
-						if (row % 3 == 2)
-						{
-							quoridor_tile.half_row = true;
-							if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
-							{
-								max_influence = influence;
-								wall_tile = quoridor_tile;
-								continue;
-							}
-							//else if (quoridor_tile.row != 0)
-							//{
-							//	quoridor_tile.col--;
-							//	if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
-							//	{
-							//		max_influence = influence;
-							//		wall_tile = quoridor_tile;
-							//		continue;
-							//	}
-							//}
-						}
-						if (col % 3 == 2)
-						{
-							quoridor_tile.half_col = true;
-							if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
-							{
-								max_influence = influence;
-								wall_tile = quoridor_tile;
-								continue;
-							}
-							//else if (quoridor_tile.col != 0)
-							//{
-							//	quoridor_tile.row--;
-							//	if (quoridor.IsLegalWall(quoridor.GetTile(), quoridor_tile))
-							//	{
-							//		max_influence = influence;
-							//		wall_tile = quoridor_tile;
-							//		continue;
-							//	}
-							//}
-						}
-
-					}
-				}
-			}
-		}
-
-		return wall_tile;*/
-
 	}
 
 	TileQ Simulator::PlaceWallRandom(const TileQ& origin, QuoridorPlayer* q)
@@ -622,11 +428,11 @@ namespace MonteCarlo {
 			return TileQ();
 	}
 
-	MonteCarloTree::Node::Node() : mParent(nullptr), mState(nullptr), mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(false) {
+	MonteCarloTree::Node::Node() : mParent(nullptr), mState(nullptr), mVisitedTimes(0u), mTotalSimulationReward(0), mAI(false) {
 
 	}
 
-	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI, TileQ wall) : mVisitedTimes(0u), mTotalSimulationReward(0.), mAI(AI),
+	MonteCarloTree::Node::Node(Node* parent, TileQ tile, bool wallPlacement, bool AI, TileQ wall) : mVisitedTimes(0u), mTotalSimulationReward(0), mAI(AI),
 	mState(new State(tile, AI, wallPlacement, wall)){
 		//add parent as parent pointer
 		mParent = parent;
@@ -667,48 +473,64 @@ namespace MonteCarlo {
 		TileQ left(previousTile.row, previousTile.col - 1);
 		TileQ down(previousTile.row - 1, previousTile.col);
 
-		//
-		if (q->IsLegalMove(previousTile, down))
-			new Node(this, down, false, !this->mAI);
 
 		//create all possible moves
+		if (q->IsLegalMove(previousTile, down))
+			new Node(this, down, false, !this->mAI);
 		if (q->IsLegalMove(previousTile, up))
 			new Node(this, up, false, !this->mAI);
-
 		if (q->IsLegalMove(previousTile, right))
 			new Node(this, right, false, !this->mAI);
-		//
-		if (q->IsLegalMove(previousTile, left))
-			new Node(this, left, false, !this->mAI);
+		//if (q->IsLegalMove(previousTile, left))
+		//	new Node(this, left, false, !this->mAI);
 
 		//create all wall placement
 		if (q->GetWalls() > 0) {
+			int maximumWallMoves = mMaximumWallChildren;
 			if (this->mAI) {
-				if(q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, true, false)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, true, false));
-				if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, true, false)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, true, false));
-				if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, false, true)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, false, true));
-				if (q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col, false, true)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row, aiTile.col, false, true));
-				if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, false, true)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, false, true));
-				if (q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col - 1, false, true)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row, aiTile.col - 1, false, true));
+				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, true, false))) {
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, true, false));
+				//}
+				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, true, false))){
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, true, false));
+				//}
+				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, false, true))) {
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, false, true));
+				//}
+				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col, false, true))) {
+				//}
+				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, false, true))){
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, false, true));
+				//}
+				//if ( q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col - 1, false, true)))
+				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row, aiTile.col - 1, false, true));
 			}
 			else {
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false)))
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false)))
+					maximumWallMoves--;
+				}
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row-1, humanTile.col, true, false))){
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row-1, humanTile.col, true, false));
+					maximumWallMoves--;
+				}
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, true, false));
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true)))
+					maximumWallMoves--;
+				}
+				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col, false, true));
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true)))
+					maximumWallMoves--;
+				}
+				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true)))
+					maximumWallMoves--;
+				}
+				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+					maximumWallMoves--;
+				}
+				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 			}
 		}
