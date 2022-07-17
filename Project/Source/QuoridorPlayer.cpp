@@ -854,7 +854,7 @@ void QuoridorPlayer::Update()
 //	return finish;
 //}
 
-bool QuoridorPlayer::PlayerHasShortestPath(const TileQ& player_tile, const TileQ& ai_tile)
+bool QuoridorPlayer::PlayerHasShortestPath(const TileQ& player_tile, const TileQ& ai_tile, bool aiTurn)
 {
 	int width = g_terrain.GetWidth();
 	size_t size_player = 100000, size_ai = 100000;
@@ -871,6 +871,10 @@ bool QuoridorPlayer::PlayerHasShortestPath(const TileQ& player_tile, const TileQ
 				size_ai = m_waypointList.size();
 		}
 	}
+
+	//if same size, winner will be the one that starts moving
+	if (size_player == size_ai)
+		return !aiTurn;
 
 	return (size_player < size_ai);
 }

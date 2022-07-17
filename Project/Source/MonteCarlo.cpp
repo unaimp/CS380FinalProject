@@ -88,8 +88,7 @@ namespace MonteCarlo {
 			Node* leafNode = Selection(mRoot);
 			Node* expandedNode = Expansion(leafNode);
 			bool simulationValue = Simulation(expandedNode);
-			if (mSimFAIL == false)
-				BackPropagation(expandedNode, simulationValue);
+			BackPropagation(expandedNode, simulationValue);
 
 			//timeout
 			if (g_clock.GetAbsoluteTime() - startingTime > mAIDificulty.mMaximumTime)
@@ -315,7 +314,7 @@ namespace MonteCarlo {
 
 		//timeout in simulation
 		if (mSimFAIL == true)
-			return false;
+			simValue =  !mAIPlayer->PlayerHasShortestPath(playerTile, aiTile, !node->mAI);
 
 		//stats
 		if (simValue)
@@ -331,7 +330,7 @@ namespace MonteCarlo {
 		if (node == nullptr)		return; //root node
 
 		//update values
-		if(aiWon /*&& node->mAI	||		!aiWon && !node->mAI*/)
+		if(aiWon)
 			node->mTotalSimulationReward++;
 
 		node->mVisitedTimes++;
