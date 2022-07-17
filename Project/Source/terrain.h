@@ -32,6 +32,7 @@ public:
 
 	void Create(void);
 	void NextMap(void);
+	void ResetMap(void);
 	int GetMapIndex(void)					{ return(m_nextMap); }
 	Map *GetCurrentMap(void);
 	inline size_t NumberOfMaps(void)		{ return m_maps.size(); }
@@ -93,6 +94,10 @@ public:
 
 	float Lerp(float num1, float num2, float t);
 
+	void SetEnd(bool ai) { m_ai_end = ai; m_end = true; }
+	bool IsEnd() { return m_end; }
+	bool DidAIWin() { return m_ai_end; }
+
 protected:
 
 	// Map List parameters
@@ -118,6 +123,9 @@ protected:
 	D3DXVECTOR3 m_mouse_pos;
 	bool m_mouse_click;
 	bool m_player_turn;
+
+	bool m_end;
+	bool m_ai_end;
 
 	void AnalyzeOpennessClosestWall(void);
 	void AnalyzeVisibility(void);

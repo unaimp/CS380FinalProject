@@ -46,6 +46,7 @@ namespace MonteCarlo {
 		void End(void);
 
 		std::string GetStats() { return mStats; }
+		void Reset() { mStats = std::string(); }
 
 	private:
 		void Eraser(Node* n);
