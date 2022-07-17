@@ -5,7 +5,20 @@ class TileQ;
 namespace MonteCarlo {
 	struct Simulator; //fwd declaration
 
-	static int mMaximumIterations;
+	enum Level {
+		L_EASY,
+		L_MID,
+		L_HARD
+	};
+
+	static struct {
+		float mMaximumTimeInSimulation;
+		int mMaximumIterations;
+		float mMaximumTime;
+
+		Level mLevel = Level::L_HARD;
+	} mAIDificulty;
+
 
 	class MonteCarloTree {
 	public:
@@ -58,6 +71,8 @@ namespace MonteCarlo {
 		int mAIWinTimes;
 		int mPlayerWinTimes;
 
+		bool mSimFAIL;
+
 		std::string mStats;
 	};
 
@@ -65,7 +80,7 @@ namespace MonteCarlo {
 
 	struct Simulator {
 		Simulator();
-		bool Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts);
+		bool Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts, bool& simFail);
 		State RollOut(const State currentState, QuoridorPlayer* movingQuoridor, QuoridorPlayer* otherPlayer, bool AITurn, std::vector<Moves>& posibleMoves = std::vector<Moves>());
 
 		TileQ PlaceWallRandom(const TileQ& origin, QuoridorPlayer* q);

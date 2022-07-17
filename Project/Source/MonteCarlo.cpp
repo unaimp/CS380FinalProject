@@ -19,9 +19,26 @@ namespace MonteCarlo {
 
 
 	void MonteCarloTree::Start(void) {
-		mMaximumIterations = 10000;
-
 		mCurrentIterations = 0;
+
+		//set ai difficulty
+		switch (mAIDificulty.mLevel) {
+		case L_EASY:
+			mAIDificulty.mMaximumIterations = 750;
+			mAIDificulty.mMaximumTime = 2.f;
+			mAIDificulty.mMaximumTimeInSimulation = 0.5f;
+		break;
+		case L_MID:
+			mAIDificulty.mMaximumIterations = 7500;
+			mAIDificulty.mMaximumTime = 4.f;
+			mAIDificulty.mMaximumTimeInSimulation = 1.25f;
+			break;
+		case L_HARD:
+			mAIDificulty.mMaximumIterations = 25000;
+			mAIDificulty.mMaximumTime = 12.f;
+			mAIDificulty.mMaximumTimeInSimulation = 5.f;
+			break;
+		}
 
 		if (!mAIPlayer) {
 			mAIPlayer = &g_database.Find("NPC")->GetQuoridor();
@@ -57,7 +74,8 @@ namespace MonteCarlo {
 
 		srand(time(nullptr));
 
-		while (mCurrentIterations < mMaximumIterations) {
+		float startingTime = g_clock.GetAbsoluteTime();
+		while (mCurrentIterations < mAIDificulty.mMaximumIterations) {
 			//clone actual map
 			g_terrain.CloneMap();
 
@@ -70,7 +88,12 @@ namespace MonteCarlo {
 			Node* leafNode = Selection(mRoot);
 			Node* expandedNode = Expansion(leafNode);
 			bool simulationValue = Simulation(expandedNode);
-			BackPropagation(expandedNode, simulationValue);
+			if (mSimFAIL == false)
+				BackPropagation(expandedNode, simulationValue);
+
+			//timeout
+			if (g_clock.GetAbsoluteTime() - startingTime > mAIDificulty.mMaximumTime)
+				break;
 		}
 
 		ActualMove();
@@ -96,10 +119,69 @@ namespace MonteCarlo {
 				<<". Visited times: " << it->mVisitedTimes << std::endl;
 
 			if (it->mTotalSimulationReward > higherValue) {
-				higherValue = it->mTotalSimulationReward;
-				betterOption = it;
+				//if this is mode hard add small logic of wall placement
+				if (mAIDificulty.mLevel == Level::L_HARD && betterOption && betterOption->mState->mWallPlacement == false && it->mState->mWallPlacement) {
+					float wall_winRate = static_cast<float>(it->mTotalSimulationReward) / it->mVisitedTimes;
+					float prev_winRate = static_cast<float>(betterOption->mTotalSimulationReward) / betterOption->mVisitedTimes;
+					float diff = prev_winRate / wall_winRate;
+
+					switch (mAIPlayer->GetWalls()) {
+						case 1:
+							if (diff < 0.5f) {
+								higherValue = it->mTotalSimulationReward;
+								betterOption = it;
+							}
+							break;
+						case 2: 
+							if (diff < 0.6f) {
+								higherValue = it->mTotalSimulationReward;
+								betterOption = it;
+							}
+							break;
+						case 3:
+							if (diff < 0.65f) {
+								higherValue = it->mTotalSimulationReward;
+								betterOption = it;
+							}
+							break;
+						case 4:
+							if (diff < 0.8f) {
+								higherValue = it->mTotalSimulationReward;
+								betterOption = it;
+								}
+							break;
+						case 5:
+							if (diff < 0.9f) {
+								higherValue = it->mTotalSimulationReward;
+								betterOption = it;
+							}
+							break;
+						}
+				}
+				else {
+					higherValue = it->mTotalSimulationReward;
+					betterOption = it;
+				}
 			}
 		}
+
+		//game finsihed
+			//END OF GAME
+		if (mAIPlayer->GetTile().row == 0) {
+			ss << "AI WON!!!" << std::endl;
+
+			mStats = ss.str();
+			End();
+			return;
+		}
+		if (mHumanPlayer->GetTile().row == 8) {
+			ss << "YOU WON!!!" << std::endl;
+
+			mStats = ss.str();
+			End();
+			return;
+		}
+
 
 		//actual move
 		if (betterOption->mState->mWallPlacement) {
@@ -118,8 +200,8 @@ namespace MonteCarlo {
 
 		ss << "Simulation stats:" << std::endl;
 
-		ss << "Player win rate = " << (static_cast<float>(mPlayerWinTimes) / mMaximumIterations) * 100.f << "%" << std::endl;
-		ss << "AI     win rate = " << (static_cast<float>(mAIWinTimes) / mMaximumIterations) * 100.f << "%" << std::endl;
+		ss << "Player win rate = " << (static_cast<float>(mPlayerWinTimes) / mCurrentIterations) * 100.f << "%" << std::endl;
+		ss << "AI     win rate = " << (static_cast<float>(mAIWinTimes) / mCurrentIterations) * 100.f << "%" << std::endl;
 
 		mStats = ss.str();
 
@@ -192,9 +274,19 @@ namespace MonteCarlo {
 			return leafNode;
 		}
 		else {
+			//placing a wall if it is a wallplacement node
+			if (leafNode->mState->mWallPlacement) {
+				if (leafNode->mAI) {
+					mAIPlayer->SetWallClone(leafNode->mState->mWall);
+					mAIPlayer->m_simulation_walls--;
+				}
+				else {
+					mHumanPlayer->SetWallClone(leafNode->mState->mWall);
+					mHumanPlayer->m_simulation_walls--;
+				}
+			}
 			//create this node children actions and rollout from one of them
 			leafNode->CreateChildren(mAIPlayer, mHumanPlayer);
-
 			return leafNode->mChildren[0];
 		}
 	}
@@ -238,7 +330,12 @@ namespace MonteCarlo {
 			}
 		}
 
-		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, !node->mAI);
+		
+		bool simValue = mSimulator->Simulate(aiTile, playerTile, mAIPlayer, mHumanPlayer, !node->mAI, mSimFAIL);
+
+		//timeout in simulation
+		if (mSimFAIL == true)
+			return false;
 
 		//stats
 		if (simValue)
@@ -267,12 +364,21 @@ namespace MonteCarlo {
 		mAIRow(-1), mAIColumn(-1),
 		mPlayerRow(-1), mPlayerColumn(-1) {}
 
-	bool Simulator::Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts) {
+	bool Simulator::Simulate(const TileQ& AITile, const TileQ& playerTile, QuoridorPlayer* AI, QuoridorPlayer* player, bool AIStarts, bool& simFail) {
+		simFail = false;
+
 		State AIState = State(AITile, true, false);
 		State playerState = State(playerTile, false, false);
 
+		float simStartTime = g_clock.GetAbsoluteTime();
 		//During simulation the moves are chosen with respect to a function called rollout policy function (which has some biased stats)
 		while (1) {
+			//simulation timeout
+			if (g_clock.GetAbsoluteTime() - simStartTime > mAIDificulty.mMaximumTimeInSimulation) {
+				simFail = true;
+				return false;
+			}
+
 			if (AIStarts) {
 				//AI simulation turn
 				if (AIState.IsTerminal()) {
@@ -307,7 +413,7 @@ namespace MonteCarlo {
 		//moves are not created yet
 		if (posibleMoves.empty()) {
 			//BIASED ACTIONS, highly expected to move forward if possible
-			for(int i = 0; i < 20; i++)
+			for(int i = 0; i < 10; i++)
 				posibleMoves.push_back(Moves::M_MOVE_FWD);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
 			posibleMoves.push_back(Moves::M_MOVE_RIGHT);
@@ -439,26 +545,20 @@ namespace MonteCarlo {
 			new Node(this, left, false, !this->mAI);
 
 		//create all wall placement
+		if (this->mParent) {
+			if (this->mParent->mParent)
+				if (this->mParent->mParent->mParent) {
+					//if mode hard make the tree more precise
+					if (mAIDificulty.mLevel == Level::L_HARD) {
+						if (this->mParent->mParent->mParent->mParent)
+							if (this->mParent->mParent->mParent->mParent->mParent)
+								return;
+					}
+					return; //only create walls moves in 2 future movees
+				}
+		}
 		if (q->GetWalls() > 0) {
-			if (this->mAI) {
-				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, true, false))) {
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, true, false));
-				//}
-				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, true, false))){
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, true, false));
-				//}
-				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col, false, true))) {
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col, false, true));
-				//}
-				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col, false, true))) {
-				//}
-				//if (q->IsLegalWall(previousTile, TileQ(aiTile.row - 1, aiTile.col - 1, false, true))){
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row - 1, aiTile.col - 1, false, true));
-				//}
-				//if ( q->IsLegalWall(previousTile, TileQ(aiTile.row, aiTile.col - 1, false, true)))
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(aiTile.row, aiTile.col - 1, false, true));
-			}
-			else {
+			if (!this->mAI) {
 				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
 				}
@@ -471,11 +571,11 @@ namespace MonteCarlo {
 				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))) {
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
 				}
-				//if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
-				//}
-				//else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
-				//	new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
+				}
+				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 			}
 		}
 	}
