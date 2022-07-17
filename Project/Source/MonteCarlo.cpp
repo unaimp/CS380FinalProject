@@ -19,7 +19,7 @@ namespace MonteCarlo {
 
 
 	void MonteCarloTree::Start(void) {
-		mMaximumIterations = 1000;
+		mMaximumIterations = 10000;
 		mMaximumWallChildren = 6;
 
 		mCurrentIterations = 0;
@@ -59,59 +59,24 @@ namespace MonteCarlo {
 
 		srand(time(nullptr));
 
-		//Some game moments where it is quicker and more intelligent to have some moves
-		//predefined
-		bool intelligentMove = false;/* IntelligentMoves();*/
+		while (mCurrentIterations < mMaximumIterations) {
+			//clone actual map
+			g_terrain.CloneMap();
 
-		if(!intelligentMove){
-			while (mCurrentIterations < mMaximumIterations) {
-				//clone actual map
-				g_terrain.CloneMap();
+			mCurrentIterations++;
 
-				mCurrentIterations++;
+			mHumanPlayer->m_simulation_walls = mHumanPlayer->m_walls;
+			mAIPlayer->m_simulation_walls = mAIPlayer->m_walls;
 
-				mHumanPlayer->m_simulation_walls = mHumanPlayer->m_walls;
-				mAIPlayer->m_simulation_walls = mAIPlayer->m_walls;
-
-				//Principle of operations
-				Node* leafNode = Selection(mRoot);
-				Node* expandedNode = Expansion(leafNode);
-				bool simulationValue = Simulation(expandedNode);
-				BackPropagation(expandedNode, simulationValue);
-			}
-
-			ActualMove();
-		}
-	}
-
-	bool MonteCarloTree::IntelligentMoves() {
-		TileQ playerTile = mHumanPlayer->GetTile();
-		TileQ aiTile = mAIPlayer->GetTile();
-
-		mStats.clear();
-		std::stringstream ss;
-
-		//AI loose condition in 2 moves, place a wall
-		if (!mIntelligent1Used && 8 - playerTile.row <= 2) {
-			if(!mAIPlayer->IsLegalMove(aiTile, TileQ(aiTile.row - 1, aiTile.col)) ||
-				!mAIPlayer->IsLegalMove(TileQ(aiTile.row - 1, aiTile.col), TileQ(aiTile.row - 2, aiTile.col))) {
-				if (mAIPlayer->GetWalls() > 0 && mHumanPlayer->IsLegalMove(playerTile, TileQ(playerTile.row + 1, playerTile.col)) &&
-					mHumanPlayer->IsLegalMove(TileQ(playerTile.row + 1, playerTile.col), TileQ(playerTile.row + 2, playerTile.col))) {
-					TileQ wall(playerTile);
-						wall.half_row = true;
-						ss << "Intelligent move\n Placing a wall in: " << wall.row << ", " << wall.col << std::endl;
-						mAIPlayer->SetWall(wall);
-						mAIPlayer->m_walls--;
-						mIntelligent1Used = true;
-						mStats = ss.str();
-						return true;
-				}
-			}
+			//Principle of operations
+			Node* leafNode = Selection(mRoot);
+			Node* expandedNode = Expansion(leafNode);
+			bool simulationValue = Simulation(expandedNode);
+			BackPropagation(expandedNode, simulationValue);
 		}
 
-
-
-		return false;
+		ActualMove();
+		
 	}
 
 	void MonteCarloTree::ActualMove() {
@@ -390,11 +355,9 @@ namespace MonteCarlo {
 		}
 
 		if (movingQuoridor->IsLegalMove(currentState.mTile, destinationTile)) {
-			std::cout << "CORRECT ";
 			return State(destinationTile, AITurn, false);
 		}
 		else {
-			std::cout << "illegal " << posibleMoves[randomNumber] <<std::endl;
 			//erase this possibility from the vector
 			Moves movetoDelete = posibleMoves[randomNumber];
 			for (auto it = posibleMoves.begin(); it != posibleMoves.end(); ) {
@@ -481,8 +444,8 @@ namespace MonteCarlo {
 			new Node(this, up, false, !this->mAI);
 		if (q->IsLegalMove(previousTile, right))
 			new Node(this, right, false, !this->mAI);
-		//if (q->IsLegalMove(previousTile, left))
-		//	new Node(this, left, false, !this->mAI);
+		if (q->IsLegalMove(previousTile, left))
+			new Node(this, left, false, !this->mAI);
 
 		//create all wall placement
 		if (q->GetWalls() > 0) {
@@ -508,29 +471,20 @@ namespace MonteCarlo {
 			else {
 				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
-					maximumWallMoves--;
 				}
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row-1, humanTile.col, true, false))){
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row-1, humanTile.col, true, false));
-					maximumWallMoves--;
-				}
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false))){
+				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, true, false));
-					maximumWallMoves--;
 				}
-				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true))){
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col, false, true));
-					maximumWallMoves--;
 				}
-				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))){
+				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))) {
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
-					maximumWallMoves--;
 				}
-				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
+				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
-					maximumWallMoves--;
 				}
-				if (maximumWallMoves > 0 && q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
 					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 			}
 		}
