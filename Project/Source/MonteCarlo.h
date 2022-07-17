@@ -16,7 +16,7 @@ namespace MonteCarlo {
 		int mMaximumIterations;
 		float mMaximumTime;
 
-		Level mLevel = Level::L_HARD;
+		Level mLevel = Level::L_EASY;
 	} mAIDificulty;
 
 

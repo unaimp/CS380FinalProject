@@ -29,14 +29,14 @@ namespace MonteCarlo {
 			mAIDificulty.mMaximumTimeInSimulation = 0.5f;
 		break;
 		case L_MID:
-			mAIDificulty.mMaximumIterations = 7500;
+			mAIDificulty.mMaximumIterations = 5000;
 			mAIDificulty.mMaximumTime = 4.f;
-			mAIDificulty.mMaximumTimeInSimulation = 1.25f;
+			mAIDificulty.mMaximumTimeInSimulation = 0.75f;
 			break;
 		case L_HARD:
-			mAIDificulty.mMaximumIterations = 25000;
-			mAIDificulty.mMaximumTime = 12.f;
-			mAIDificulty.mMaximumTimeInSimulation = 5.f;
+			mAIDificulty.mMaximumIterations = 15000;
+			mAIDificulty.mMaximumTime = 9.f;
+			mAIDificulty.mMaximumTimeInSimulation = 1.5f;
 			break;
 		}
 
@@ -112,11 +112,9 @@ namespace MonteCarlo {
 		for (auto& it : mRoot->mChildren) {
 			//print out data
 			if(it->mState->mWallPlacement)
-				ss << "Placing a wall in:  " << it->mState->mWall.row << ", " << it->mState->mWall.col << " has a value of: " << it->mTotalSimulationReward
-				<< ". Visited times: " << it->mVisitedTimes << std::endl;
+				ss << "Placing a wall in:  " << it->mState->mWall.row << ", " << it->mState->mWall.col << " has a value of: " << it->mTotalSimulationReward << std::endl;
 			else
-				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward 
-				<<". Visited times: " << it->mVisitedTimes << std::endl;
+				ss << "Moving to: " << it->mState->mTile.row << ", " << it->mState->mTile.col << " has value of: " << it->mTotalSimulationReward  << std::endl;
 
 			if (it->mTotalSimulationReward > higherValue) {
 				//if this is mode hard add small logic of wall placement
@@ -164,24 +162,6 @@ namespace MonteCarlo {
 				}
 			}
 		}
-
-		//game finsihed
-			//END OF GAME
-		if (mAIPlayer->GetTile().row == 0) {
-			ss << "AI WON!!!" << std::endl;
-
-			mStats = ss.str();
-			End();
-			return;
-		}
-		if (mHumanPlayer->GetTile().row == 8) {
-			ss << "YOU WON!!!" << std::endl;
-
-			mStats = ss.str();
-			End();
-			return;
-		}
-
 
 		//actual move
 		if (betterOption->mState->mWallPlacement) {
@@ -559,23 +539,44 @@ namespace MonteCarlo {
 		}
 		if (q->GetWalls() > 0) {
 			if (!this->mAI) {
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))){
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
+				if (mAIDificulty.mLevel == Level::L_HARD) {
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, true, false));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, false, true));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, false, true));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 				}
-				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false))){
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, true, false));
+				else {
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, true, false))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, true, false));
+					}
+					else if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, true, false))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, true, false));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col, false, true));
+					}
+					else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
+					}
+					if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))) {
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row, humanTile.col - 1, false, true));
+					}
+					else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
+						new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 				}
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col, false, true))){
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col, false, true));
-				}
-				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col, false, true))) {
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col, false, true));
-				}
-				if (q->IsLegalWall(previousTile, TileQ(humanTile.row, humanTile.col - 1, false, true))){
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row , humanTile.col - 1, false, true));
-				}
-				else if (q->IsLegalWall(previousTile, TileQ(humanTile.row - 1, humanTile.col - 1, false, true)))
-					new Node(this, previousTile, true, !this->mAI, TileQ(humanTile.row - 1, humanTile.col - 1, false, true));
 			}
 		}
 	}

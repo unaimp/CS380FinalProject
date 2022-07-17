@@ -1,20 +1,20 @@
 ﻿  MonteCarlo.cpp
 C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(75,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
 C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(77,22): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(252,21): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(373,22): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
-C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(426,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
-C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(475,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(232,21): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(353,22): warning C4244: 'inicializando': conversión de 'double' a 'float'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(406,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(455,13): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(392,1): warning C4530: Se ha utilizado el controlador de excepciones de C++, pero la semántica de desenredo no está habilitada. Especifique /EHsc
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\ostream(385): message : al compilar la función del miembro clase plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(float)"
-C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(203): message : Vea la referencia a la creación de una instancia de la función plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(float)" que se está compilando
+C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(183): message : Vea la referencia a la creación de una instancia de la función plantilla "std::basic_ostream<char,std::char_traits<char>> &std::basic_ostream<char,std::char_traits<char>>::operator <<(float)" que se está compilando
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\istream(708): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_ostream<char,std::char_traits<char>>" que se está compilando
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\sstream(786): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_iostream<char,std::char_traits<char>>" que se está compilando
 C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Source\MonteCarlo.cpp(108): message : Vea la referencia a la creación de una instancia de clase plantilla "std::basic_stringstream<char,std::char_traits<char>,std::allocator<char>>" que se está compilando
 LINK : warning LNK4075: se omite '/INCREMENTAL' debido a la especificación '/LTCG'
   Generando código
-  2 of 3274 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 3278 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    20 functions had inline decision re-evaluated but remain unchanged
+    22 functions had inline decision re-evaluated but remain unchanged
   Generación de código finalizada
   MCTSQuoridorProject.vcxproj -> C:\Users\Unai\OneDrive\Documentos\GitHub\CS380FinalProject\Project\Release\MCTSQuoridorProject.exe
