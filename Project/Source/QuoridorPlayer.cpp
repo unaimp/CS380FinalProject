@@ -928,6 +928,11 @@ bool QuoridorPlayer::WallCheck(int or , int oc, int r, int c)
 	// If it's a wall already, return true
 	if (g_terrain.IsWallClone(r, c))
 		return true;
+	// If both to the sides have walls, this also has wall
+	if (g_terrain.IsWallClone(r - 1, c) && g_terrain.IsWallClone(r + 1, c))
+		return true;
+	if (g_terrain.IsWallClone(r, c - 1) && g_terrain.IsWallClone(r, c + 1))
+		return true;
 	// If it's a diagonal
 	if (IsDiagonal(or , oc, r, c))
 	{
