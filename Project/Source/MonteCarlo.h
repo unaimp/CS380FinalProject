@@ -48,6 +48,9 @@ namespace MonteCarlo {
 		std::string GetStats() { return mStats; }
 		void Reset() { mStats = std::string(); }
 
+		void SetDifficulty(Level lev) { mAIDificulty.mLevel = lev; }
+		Level GetDifficulty() { return mAIDificulty.mLevel; }
+
 	private:
 		void Eraser(Node* n);
 		//Principle of operation

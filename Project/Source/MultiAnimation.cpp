@@ -118,6 +118,7 @@ D3DXVECTOR3				g_click3D;
 #define IDC_QUORY_WALL          51
 #define IDC_QUORY_STAIR         52
 #define IDC_RESETMAP            53
+#define IDC_DIFFICULTY          54
 
 //--------------------------------------------------------------------------------------
 // Forward declarations
@@ -260,7 +261,7 @@ void InitApp()
 
 	g_SampleUI.AddButton(IDC_QUORY_MOVE, L"Player Quoridor Action", 45, iY, 120, 24);
 
-	g_SampleUI.AddButton(IDC_NEXTMAP, L"Next Map", 45, iY += 52, 120, 24);
+	g_SampleUI.AddButton(IDC_DIFFICULTY, L"Toggle Difficulty", 45, iY += 52, 120, 24);
 
 	g_SampleUI.AddButton(IDC_RESETMAP, L"Restart Game", 45, iY += 52, 120, 24);
 
@@ -871,6 +872,15 @@ void RenderText()
 	txtHelper.SetInsertionPos(5, y += 10);
 	txtHelper.DrawFormattedTextLine(L"NPC Walls:                %d", npc.GetWalls());
 
+
+	// Print out difficulty
+	txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	txtHelper.SetInsertionPos(5, y += 20);
+	MonteCarlo::Level level = g_database.mAILogic->GetDifficulty();
+	if (level == MonteCarlo::Level::L_EASY) { txtHelper.DrawFormattedTextLine(L"Difficulty is set to:    EASY"); }
+	else if (level == MonteCarlo::Level::L_MID) { txtHelper.DrawFormattedTextLine(L"Difficulty is set to:    MID"); }
+	else if (level == MonteCarlo::Level::L_HARD)  { txtHelper.DrawFormattedTextLine(L"Difficulty is set to:    HARD"); }
+
 	std::string ai_stats = g_database.mAILogic->GetStats();
 	std::wstring widestr = std::wstring(ai_stats.begin(), ai_stats.end());
 	const WCHAR* ai = widestr.c_str();
@@ -884,7 +894,7 @@ void RenderText()
 	if (g_terrain.IsEnd())
 	{
 		txtHelper.SetForegroundColor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-		txtHelper.SetInsertionPos(5, y += 200);
+		txtHelper.SetInsertionPos(500, 10);
 		if (g_terrain.DidAIWin())
 			txtHelper.DrawTextLine(L"NPC WIN");
 		else
@@ -1565,9 +1575,22 @@ void CALLBACK OnGUIEvent(UINT nEvent, int nControlID, CDXUTControl* pControl, vo
 			g_terrain.SetPlayerQuoridorMode(g_terrain.GetPlayerQuoridorMode()+1);
 		break;
 
-	case IDC_NEXTMAP:
-		g_terrain.NextMap();
-		break;
+	case IDC_DIFFICULTY:
+		if (g_database.mAILogic->GetDifficulty() == MonteCarlo::Level::L_EASY)
+		{
+			g_database.mAILogic->SetDifficulty(MonteCarlo::Level::L_MID);
+			break;
+		}
+		if (g_database.mAILogic->GetDifficulty() == MonteCarlo::Level::L_MID)
+		{
+			g_database.mAILogic->SetDifficulty(MonteCarlo::Level::L_HARD);
+			break;
+		}
+		if (g_database.mAILogic->GetDifficulty() == MonteCarlo::Level::L_HARD)
+		{
+			g_database.mAILogic->SetDifficulty(MonteCarlo::Level::L_EASY);
+			break;
+		}
 
 	case IDC_RESETMAP:
 		g_database.mAILogic->Reset();
